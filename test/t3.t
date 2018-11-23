@@ -1,3 +1,7 @@
 ``
-Check multiple inclusion:
+Check nested inclusion:
+---------------------------------------
 `pre_pro('t2.t')`
+
+
+---------------------------------------

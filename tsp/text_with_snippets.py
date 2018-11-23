@@ -26,9 +26,26 @@ See detailed description in 'doc' directory of the source distribution.
 
 .. todo::
 
-    Optional parameter to prepro to indent all resulting text. (Thus,
-    indentation will be defined in the parent template, not in the child
-    template)
+
+    * Indentation:
+
+     Optional parameter to prepro to indent all resulting text. (Thus,
+     indentation will be defined in the parent template, not in the child
+     template)
+
+
+    * Sequence of values for parametric studies
+
+     Command line parameter specifying a seequence of input parameters.
+     Generates several resulting files. Possible command line syntax:
+
+        --ParameterName "python expression for sequence"
+
+     i.e one can specify arbitrary variable name. If several ranges are given,
+     the number of resulting files is N1 x N2 x ... Nm, where Ni -- number of
+     values for i-th variable.
+
+        --a "range(10)" --b "np.arange(0.01, 0.05, 10)"
 
 """
 
@@ -50,16 +67,40 @@ from stat import S_IREAD, S_IWRITE
 _logLevel = 1  # 0 -- output at least.
 
 
-def _log(msg, level):
+class _Log(object):
     """
-    Output msg corresponding to the _logLevel value.
+    To print out log information. Implemented as a class to contain
+    snippet-specific information as instance properties.
+    """
+    def __init__(self, tname, level):
+        """
+        ``tname`` -- The current template filename
+        ``level`` -- The log level. The bigger this value, the more
+        information is printed out.
+        """
+        self.tname = tname  # Current template filename
+        self.level = level  # Log level
+        return
 
-    The message `msg` is printed to standard output if `level` is equal or
-    above `_logLevel`.
-    """
-    if level <= _logLevel:
-        print >> sys.__stdout__, '    '*level, level, msg
-    return
+    def __call__(self, *args, **kwargs):
+        self.log(*args, **kwargs)
+
+    def log(self, mlev, msg, line=None, snippet=None):
+        """
+        Print message ``msg`` of the level ``mlev``. The message is actualy
+        printed only if the message level is below the log level.
+
+        When ``line`` and ``snippet`` are given, they are printed out too,
+        to identify the snipped, to which the message corresponds.
+        """
+        sign = 'Message {} from {}'.format(mlev, self.tname)
+        if line:
+            sign += '\n    line {}'.format(line)
+        if snippet:
+            sign += '\n    snippet {}'.format(snippet)
+
+        if mlev <= self.level:
+            print >> sys.__stdout__, sign, msg
 
 
 class _WritableObject:
@@ -96,58 +137,64 @@ _OptionsList = [
     '-D',  # default. Do not preserve snippet place.
     ]
 
-messageError1line1 = """ERROR in template: The first line of template must specify
-                    optional comment string,  starting  and
-                    ending delimiters,  i.e.  be at least 2
-                    characters long."""
-messageWarn1 = """WARNING: the delimiter specified on the first line of
-         the template, is alpha-numeric or blank.
-
-         COMMENTING STRING: {0}
-         STARTING DELIMITER: {1}
-         ENDING DELIMITER: {2}"""
-messageWarn2 = """WARNING: string of commenting characters
-         is empty.  Multi-line  snippets
-         will not be commented out."""
 
 
-def firstline(l1):
+def firstline(l1, _log):
     """
-    Get commenting string, default key and delimiters from the 1-st line ``l``.
+    Get commenting string, default key and delimiters from the 1-st line ``l1``.
+
+    ``_log`` is a logger, used to print out warnings etc.
     """
     # Check the first line with comment and insertion marks.
     # Default parameters of the first line:
     TemplateOpt = '-D'
     Cchar = ''
     if len(l1) < 2:
-        raise SystemExit(messageError1line1)
+        msg = """
+        ERROR:
+            The first line of template must specify optional comment string,
+            starting  and ending delimiters,  i.e.  be at least 2 characters
+            long."""
+        msg = dedent(msg[1:])
+        _log(0, msg, line=1)
+        raise SystemExit(msg)
     else:
         # read the delimiters:
         Schar, Echar = l1[-2:]
         l1 = l1[:-2]
-        if len(l1) > 0:
-            # check if default snippet key is given in the first line:
-            TemplateOpt = '-D'  # default option means do not preserve place.
-            it = iter(l1)
-            cprev = next(it)
-            for c in it:
-                if cprev + c in _OptionsList:
-                    TemplateOpt = cprev + c
-                    l1 = l1.replace(TemplateOpt, '')
-                    break
-                cprev = c
-            # the rest in the 1st line is the string of commenting characters:
-            Cchar = l1[:]  # empy indices to make copy of l1.
+        # Read the default option, if given:
+        if len(l1) >=2:
+            # 1st line can contain the default option in its first two chars.
+            if l1[:2] in _OptionsList:
+                TemplateOpt = l1[:2]
+                l1 = l1[2:]
+        # read the commenting string, if given:
+        if l1:
+            Cchar = l1[:]
 
     # perform some check of the Schar and Echar:
     for char in [Schar, Echar]:
         if char.isalnum() or char == ' ':
-            _log(messageWarn1.format(Cchar, Schar, Echar), 1)
+            msg = """
+            WARNING:
+                the delimiter specified on the first line of
+                the template, is alpha-numeric or blank.
+
+                COMMENTING STRING: {0}
+                STARTING DELIMITER: {1}
+                ENDING DELIMITER: {2}""".format(Cchar, Schar, Echar)
+            msg = dedent(msg[1:])
+            _log(1, msg, line=1)
             break  # one warning is enough
 
     # issue warning, if commenting char is empty:
     if Cchar == '':
-        _log(messageWarn2, 1)
+        msg = """
+        WARNING:
+            string of commenting characters is empty.
+            Multi-line  snippets remain uncommented."""
+        msg = dedent(msg[1:])
+        _log(1, msg, line=1)
     return TemplateOpt, Cchar, Schar, Echar
 
 
@@ -225,23 +272,24 @@ def pre_pro(fname, level='default', preamb=''):
 
     """
     tfile = open(fname, 'rb')
+    _log = _Log(fname, _logLevel)
     # check template and resulting files modification time with seconds
     # precision. More precision is not needed.
     tmtime = int(path.getmtime(tfile.name))
     tatime = int(path.getatime(tfile.name))
     s = tfile.read()
-    _log('Process file {0}'.format(tfile.name), 0)
+    _log(0, 'Start processing')
 
     # this is the 1-st line, without trailing spaces.  Do not put this line to
     # the resulting file. '+1' to avoid empty line at the begining of the
     # resulting file.
     l1 = s[:s.index('\n')].rstrip()
     s = s[s.index('\n')+1:]
-    TemplateOpt, Cchar, Schar, Echar = firstline(l1)
-    _log('First line: {0}'.format(l1), 3)
-    _log('Default option: {0}'.format(TemplateOpt), 3)
-    _log('Commenting str: {0}'.format(Cchar), 3)
-    _log('Delimiters    : {0} {1}'.format(Schar, Echar), 3)
+    TemplateOpt, Cchar, Schar, Echar = firstline(l1, _log)
+    _log(3, 'First line: {0}'.format(l1))
+    _log(3, 'Default option: {0}'.format(TemplateOpt))
+    _log(3, 'Commenting str: {0}'.format(Cchar))
+    _log(3, 'Delimiters    : {0} {1}'.format(Schar, Echar))
 
     # Regular expression to match insertions:
     t_ins = re.compile('(' + Schar + '.*?' + Echar + ')', re.DOTALL)
@@ -259,13 +307,13 @@ def pre_pro(fname, level='default', preamb=''):
     for t in spl:
         nl_spl.append(nl_spl[-1] + t.count('\n'))
     nl_spl.pop(-1)
-    _log('List of line numbers: {}'.format(nl_spl), 3)
-    _log('Text parts: {}'.format(spl), 3)
+    _log(3, 'List of line numbers: {}'.format(nl_spl))
+    _log(3, 'Text parts: {}'.format(spl))
 
     # check for the unpaired delimiters. If they are,
     # the last element of spl should have one.
     if Schar in spl[-1] or Echar in spl[-1]:
-        _log('WARNING: there are unpaired delimiters.', 1)
+        _log(1, 'WARNING: there are unpaired delimiters.')
 
     # try to evaluate and to execute. Snippets are evaluated or executed in the
     # global namespace, which is returned by globals() function.  This ensures
@@ -277,8 +325,7 @@ def pre_pro(fname, level='default', preamb=''):
         # If the first and last characters of the string in spl are
         # respectively Schar and Echar, this is a snippet string. Try to
         # evaluate or execute it.
-        _log('Processing part on line {} in {}'.format(n, tfile.name), 3)
-        _log('Original text: {}'.format(repr(t)), 3)
+        _log(3, 'Starting with', line=n, snippet=t)
 
         if not is_snippet(t, Schar, Echar):
             # this is not a snippet.
@@ -288,18 +335,17 @@ def pre_pro(fname, level='default', preamb=''):
             t, SnippetOpt = removeOpt(t, TemplateOpt)
             # Just copy it to the resulting file.
             res.append(t)
-            _log('Not a snippet', 3)
+            _log(3, 'Not a snippet')
         else:
             # if snippet option set to -s, skip the snippet, i.e., do not
             # evaluate it and put its string to the result
             if SnippetOpt == '-s':
-                _log('Skipping snippet evaluation', 3)
+                _log(3, 'Skipping snippet evaluation')
                 res.append(t)
             else:
                 # this is a snippet. Evaluate or execute it.
                 # Strip delimiters:
                 snippet = t[1:-1]
-                _log('Snippet to evaluate: {}'.format(repr(snippet)), 3)
 
                 # prepare stdout capturer:
                 # To separate outputs from different snippets, their stdouts
@@ -316,9 +362,10 @@ def pre_pro(fname, level='default', preamb=''):
                 sys.stderr = pCatcher
                 try:
                     # try to evaluate:
-                    _log('Startnig snippet evaluation', 3)
+                    _log(3, 'Startnig snippet evaluation',
+                         line=n, snippet=snippet)
                     tmp = eval(snippet, globals())
-                    _log('Result of evaluation: {}'.format(repr(tmp)), 3)
+                    _log(3, 'Result: {}'.format(repr(tmp)))
                     et = str(tmp)
                     # if the snippet can be evaluated, substitute it with the
                     # result of evaluation.  If the result is shorter than the
@@ -344,9 +391,8 @@ def pre_pro(fname, level='default', preamb=''):
                 except NameError as err:
                     # The NameError exception raises when e.g. expression is an
                     # undefined variable.  Issue a warning
-                    _log('WARNING: Snippet on line {0} in {1} '
-                         'caused evaluation error:'.format(n, fname), 1)
-                    _log(err, 1)
+                    _log(1, 'WARNING: Snippet caused evaluation error', line=n)
+                    _log(1, err)
                     # In this case, put the snippet itself to the output file:
                     res.append(t)
                 except SyntaxError:
@@ -354,9 +400,8 @@ def pre_pro(fname, level='default', preamb=''):
                     # the snippet.  If snippet is a multi-line snippet, it must
                     # be prepared for execution: indentation possibly used in
                     # the input file should be removed.
-                    _log('Executing snippet', 3)
                     snippet = dedent(snippet)
-                    _log('Snippet: {}'.format(repr(snippet)), 3)
+                    _log(3, 'Executing snippet', line=n, snippet=repr(snippet))
 
                     # If snippet is multi-line, comment the snippet strings.
                     # Copy snippet to the result (do not copy if option -d is
@@ -366,24 +411,20 @@ def pre_pro(fname, level='default', preamb=''):
                     try:
                         # try to execute the snippet:
                         exec(snippet, globals())
-                    except:
+                    except Exception as ee:
                         exctype, excvalue = sys.exc_info()[:2]
-                        _log('WARNING: Snippet on line {0} in {1} '
-                             'caused execution error:'.format(n, fname), 1)
-                        _log(excvalue, 1)
-                        _log(exctype, 1)
-                except:
+                        _log(1, 'WARNING: Snippet caused execution error:',
+                             line=n, snippet=repr(snippet))
+                        _log(3, ee)
+                except Exception as ee:
                     # evaluation can fail for some other reason. Try to catch
                     # it and report about it
                     exct, excv, tb = sys.exc_info()
-                    _log('WARNING: Snippet on line {0} in {1} '
-                         'caused evaluation error:'.format(n, fname), 1)
-                    for ei in sys.exc_info():
-                        _log(ei, 1)
+                    _log(1, 'WARNING: Snippet caused evaluation error:',
+                         line=n, snippet=repr(snippet))
+                    _log(3, ee)
                     traceback.print_tb(tb)
                     res.append(t)
-                _log('Snippet result, as added to '
-                     'output: {}'.format(repr(res[-1])), 3)
                 # if there were some outputs in snippet, add it to ther
                 # resulting strings:
                 res += pCatcher.content
@@ -415,15 +456,14 @@ def pre_pro(fname, level='default', preamb=''):
                 else:
                     # if timestamps of template and result differ, put new
                     # result to another file.
-                    _log('File {0} exists '
-                         'and is newer than the template.'.format(rname), 1)
+                    _log(0, 'File exists and is newer than template')
                     from datetime import datetime
                     tstmp = datetime.now().strftime('%y-%m-%d-%H-%M-%S')
                     rfile = open(rname + tstmp, 'w')
 
         rfile.write(''.join(res))
         rfile.close()
-        _log('Result is written to {0}'.format(rfile.name), 0)
+        _log(0, 'Result is written to {0}'.format(rfile.name))
         # Often, a user starts to change the resulting file instead of changing
         # the template, and all the changes went when the template is
         # processed. To warn user if he tries to change the resulting file, the
@@ -434,7 +474,6 @@ def pre_pro(fname, level='default', preamb=''):
         # when a template is included with the direct call to pre_pro,
         # the last line of the included template ends with the new-line
         # character. It is not needed.
-        _log('res: {}'.format(repr(res)), 3)
         while res[-1] and res[-1][-1] in '\n\r':
             res[-1] = res[-1][:-1]
         return ''.join(res)
