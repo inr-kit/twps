@@ -64,7 +64,7 @@ from stat import S_IREAD, S_IWRITE
 #       1 -- errors and warnings
 #       2 -- errors, warnings and info
 #       3 -- errors, warnings, info and debug.
-_logLevel = 1  # 0 -- output at least.
+_logLevel = 3  # 0 -- output at least.
 
 
 class _Log(object):
@@ -138,10 +138,10 @@ _OptionsList = [
     ]
 
 
-
 def firstline(l1, _log):
     """
-    Get commenting string, default key and delimiters from the 1-st line ``l1``.
+    Get commenting string, default key and delimiters from the 1-st line
+    ``l1``.
 
     ``_log`` is a logger, used to print out warnings etc.
     """
@@ -230,7 +230,7 @@ def removeOpt(t, default):
     return t, SnippetOpt
 
 
-def pre_pro(fname, level='default', preamb=''):
+def pre_pro(fname, level='default', preamb='', **kwargs):
     """
     Preprocess template file fname.
 
@@ -249,6 +249,10 @@ def pre_pro(fname, level='default', preamb=''):
 
         A string representing the snippet to be evaluated/executed before
         snippets in the file. This is to allow snippets in the command line.
+
+    :arg kwargs:
+
+        All other keyword arguments are valiable names and their set of values.
 
     ``fname`` is a text file with python snippets. The function evaluates or
     executes snippets and replace the snippet code with the evaluation or
@@ -320,160 +324,192 @@ def pre_pro(fname, level='default', preamb=''):
     # that variables defined in one template will be visible in another
     # template.
 
+    # Global scope for evaluating/execution of snippets.
+    gld = {}
+    gld['pre_pro'] = pre_pro
+    if not kwargs:
+        kwargs['__'] = (0, )
+    rfi = 0  # counter of the output files.
     res = []  # resulting strings.
-    for n, t in zip(nl_spl, spl):
-        # If the first and last characters of the string in spl are
-        # respectively Schar and Echar, this is a snippet string. Try to
-        # evaluate or execute it.
-        _log(3, 'Starting with', line=n, snippet=t)
+    for vname, vset in kwargs.items():
+        # vname -- variable name
+        # vset -- set of values the variable takes
+        _log(1, 'Variable {}, values {}'.format(vname, vset))
+        for v in vset:
+            gld[vname] = v
+            rfi += 1
+            _log(1, 'Globals for output {}: {}'.format(rfi, gld))
 
-        if not is_snippet(t, Schar, Echar):
-            # this is not a snippet.
+            for n, t in zip(nl_spl, spl):
+                # If the first and last characters of the string in spl are
+                # respectively Schar and Echar, this is a snippet string. Try
+                # to evaluate or execute it.
+                _log(3, 'Starting with', line=n, snippet=t)
 
-            # Find options for the next snippet, remember them and remove them
-            # from result:
-            t, SnippetOpt = removeOpt(t, TemplateOpt)
-            # Just copy it to the resulting file.
-            res.append(t)
-            _log(3, 'Not a snippet')
-        else:
-            # if snippet option set to -s, skip the snippet, i.e., do not
-            # evaluate it and put its string to the result
-            if SnippetOpt == '-s':
-                _log(3, 'Skipping snippet evaluation')
-                res.append(t)
-            else:
-                # this is a snippet. Evaluate or execute it.
-                # Strip delimiters:
-                snippet = t[1:-1]
+                if not is_snippet(t, Schar, Echar):
+                    # this is not a snippet.
 
-                # prepare stdout capturer:
-                # To separate outputs from different snippets, their stdouts
-                # redirected to localy created instances of _WritableObject.
-                # To ensure that execution of prepro does not change stdout for
-                # parent scopes, sys.stdout is saved.
-
-                pCatcher = _WritableObject()
-                # save current stdout and stderr:
-                curStdout = sys.stdout
-                curStderr = sys.stderr
-                # redirect output to local variables
-                sys.stdout = pCatcher
-                sys.stderr = pCatcher
-                try:
-                    # try to evaluate:
-                    _log(3, 'Startnig snippet evaluation',
-                         line=n, snippet=snippet)
-                    tmp = eval(snippet, globals())
-                    _log(3, 'Result: {}'.format(repr(tmp)))
-                    et = str(tmp)
-                    # if the snippet can be evaluated, substitute it with the
-                    # result of evaluation.  If the result is shorter than the
-                    # snippet string, positioning of the result depends on
-                    # SnippetOpt:
-                    d = len(t) - len(et)
-                    if d > 0:
-                        if SnippetOpt == '-l':
-                            # adjust left:
-                            et = et + ' '*d
-                        elif SnippetOpt == '-r':
-                            # adjust right:
-                            et = ' '*d + et
-                        elif SnippetOpt == '-c':
-                            # center:
-                            dl = d / 2
-                            dr = d - dl
-                            et = ' '*dl + et + ' '*dr
-
-                    # add snippet evaluation result if no -d option is given.
-                    if SnippetOpt != '-d':
-                        res.append(et)
-                except NameError as err:
-                    # The NameError exception raises when e.g. expression is an
-                    # undefined variable.  Issue a warning
-                    _log(1, 'WARNING: Snippet caused evaluation error', line=n)
-                    _log(1, err)
-                    # In this case, put the snippet itself to the output file:
+                    # Find options for the next snippet, remember them and
+                    # remove them from result:
+                    t, SnippetOpt = removeOpt(t, TemplateOpt)
+                    # Just copy it to the resulting file.
                     res.append(t)
-                except SyntaxError:
-                    # If there is syntax error in evaluation, I try to execute
-                    # the snippet.  If snippet is a multi-line snippet, it must
-                    # be prepared for execution: indentation possibly used in
-                    # the input file should be removed.
-                    snippet = dedent(snippet)
-                    _log(3, 'Executing snippet', line=n, snippet=repr(snippet))
-
-                    # If snippet is multi-line, comment the snippet strings.
-                    # Copy snippet to the result (do not copy if option -d is
-                    # specified):
-                    if SnippetOpt != '-d':
-                        res.append(t.replace('\n', '\n'+Cchar))
-                    try:
-                        # try to execute the snippet:
-                        exec(snippet, globals())
-                    except Exception as ee:
-                        exctype, excvalue = sys.exc_info()[:2]
-                        _log(1, 'WARNING: Snippet caused execution error:',
-                             line=n, snippet=repr(snippet))
-                        _log(3, ee)
-                except Exception as ee:
-                    # evaluation can fail for some other reason. Try to catch
-                    # it and report about it
-                    exct, excv, tb = sys.exc_info()
-                    _log(1, 'WARNING: Snippet caused evaluation error:',
-                         line=n, snippet=repr(snippet))
-                    _log(3, ee)
-                    traceback.print_tb(tb)
-                    res.append(t)
-                # if there were some outputs in snippet, add it to ther
-                # resulting strings:
-                res += pCatcher.content
-                # return old stdout and stderr. Sys module belongs to globals,
-                # therefore changing it inside a function will interfer also
-                # parent functions. By setting it back, this interference is
-                # avoided.
-                sys.stdout = curStdout
-                sys.stderr = curStderr
-
-    if level != 'default':
-        # if the level is not default, i.e. corresponds to the main template,
-        # print resulting strings into file:
-        rname = tfile.name + '.res'
-        try:
-            rfile = open(rname, 'w')
-        except IOError as err:
-            if err.errno == 13:
-                # this is 'permission denied error', meaning that file exists
-                # and cannot be rewritten.  Check that the template and rfile
-                # have the same timestamps. If they are the same, it will be
-                # assumed that the resulting file was created from template
-                # without any other modifications and thus can be safely
-                # rewritten again.
-                rmtime = int(path.getmtime(rname))
-                if tmtime >= rmtime:
-                    chmod(rname, S_IWRITE)
-                    rfile = open(rname, 'w')
+                    _log(3, 'Not a snippet')
                 else:
-                    # if timestamps of template and result differ, put new
-                    # result to another file.
-                    _log(0, 'File exists and is newer than template')
-                    from datetime import datetime
-                    tstmp = datetime.now().strftime('%y-%m-%d-%H-%M-%S')
-                    rfile = open(rname + tstmp, 'w')
+                    # if snippet option set to -s, skip the snippet, i.e., do
+                    # not evaluate it and put its string to the result
+                    if SnippetOpt == '-s':
+                        _log(3, 'Skipping snippet evaluation')
+                        res.append(t)
+                    else:
+                        # this is a snippet. Evaluate or execute it.
+                        # Strip delimiters:
+                        snippet = t[1:-1]
 
-        rfile.write(''.join(res))
-        rfile.close()
-        _log(0, 'Result is written to {0}'.format(rfile.name))
-        # Often, a user starts to change the resulting file instead of changing
-        # the template, and all the changes went when the template is
-        # processed. To warn user if he tries to change the resulting file, the
-        # permission is set to 'read-only'.
-        utime(rfile.name, (tatime, tmtime))
-        chmod(rfile.name, S_IREAD)
-    else:
-        # when a template is included with the direct call to pre_pro,
-        # the last line of the included template ends with the new-line
-        # character. It is not needed.
+                        # prepare stdout capturer:
+                        # To separate outputs from different snippets, their
+                        # stdouts redirected to localy created instances of
+                        # _WritableObject.  To ensure that execution of prepro
+                        # does not change stdout for parent scopes, sys.stdout
+                        # is saved.
+
+                        pCatcher = _WritableObject()
+                        # save current stdout and stderr:
+                        curStdout = sys.stdout
+                        curStderr = sys.stderr
+                        # redirect output to local variables
+                        sys.stdout = pCatcher
+                        sys.stderr = pCatcher
+                        try:
+                            # try to evaluate:
+                            _log(3, 'Startnig snippet evaluation',
+                                 line=n, snippet=snippet)
+                            tmp = eval(snippet, gld)
+                            _log(3, 'Result: {}'.format(repr(tmp)))
+                            et = str(tmp)
+                            # if the snippet can be evaluated, substitute it
+                            # with the result of evaluation.  If the result is
+                            # shorter than the snippet string, positioning of
+                            # the result depends on SnippetOpt:
+                            d = len(t) - len(et)
+                            if d > 0:
+                                if SnippetOpt == '-l':
+                                    # adjust left:
+                                    et = et + ' '*d
+                                elif SnippetOpt == '-r':
+                                    # adjust right:
+                                    et = ' '*d + et
+                                elif SnippetOpt == '-c':
+                                    # center:
+                                    dl = d / 2
+                                    dr = d - dl
+                                    et = ' '*dl + et + ' '*dr
+
+                            # add snippet evaluation result if no -d option is
+                            # given.
+                            if SnippetOpt != '-d':
+                                res.append(et)
+                        except NameError as err:
+                            # The NameError exception raises when e.g.
+                            # expression is an undefined variable.  Issue a
+                            # warning
+                            _log(1,
+                                 'WARNING: Snippet caused evaluation error',
+                                 line=n)
+                            _log(1, err)
+                            # In this case, put the snippet itself to the
+                            # output file:
+                            res.append(t)
+                        except SyntaxError:
+                            # If there is syntax error in evaluation, I try to
+                            # execute the snippet.  If snippet is a multi-line
+                            # snippet, it must be prepared for execution:
+                            # indentation possibly used in the input file
+                            # should be removed.
+                            snippet = dedent(snippet)
+                            _log(3,
+                                 'Executing snippet',
+                                 line=n, snippet=repr(snippet))
+
+                            # If snippet is multi-line, comment the snippet
+                            # strings.  Copy snippet to the result (do not copy
+                            # if option -d is specified):
+                            if SnippetOpt != '-d':
+                                res.append(t.replace('\n', '\n'+Cchar))
+                            try:
+                                # try to execute the snippet:
+                                exec(snippet, gld)
+                            except Exception as ee:
+                                exctype, excvalue = sys.exc_info()[:2]
+                                _log(1, 'WARNING: '
+                                     'Snippet caused execution error:',
+                                     line=n, snippet=repr(snippet))
+                                _log(3, ee)
+                        except Exception as ee:
+                            # evaluation can fail for some other reason. Try to
+                            # catch it and report about it
+                            exct, excv, tb = sys.exc_info()
+                            _log(1, 'WARNING: '
+                                 'Snippet caused evaluation error:',
+                                 line=n, snippet=repr(snippet))
+                            _log(3, ee)
+                            traceback.print_tb(tb)
+                            res.append(t)
+                        # if there were some outputs in snippet, add it to ther
+                        # resulting strings:
+                        res += pCatcher.content
+                        # return old stdout and stderr. Sys module belongs to
+                        # globals, therefore changing it inside a function will
+                        # interfer also parent functions. By setting it back,
+                        # this interference is avoided.
+                        sys.stdout = curStdout
+                        sys.stderr = curStderr
+
+            if level != 'default':
+                # if the level is not default, i.e. corresponds to the main
+                # template, print resulting strings into file:
+                rname = tfile.name + '{}.res'.format(rfi)
+                try:
+                    rfile = open(rname, 'w')
+                except IOError as err:
+                    if err.errno == 13:
+                        # this is 'permission denied error', meaning that file
+                        # exists and cannot be rewritten.  Check that the
+                        # template and rfile have the same timestamps. If they
+                        # are the same, it will be assumed that the resulting
+                        # file was created from template without any other
+                        # modifications and thus can be safely rewritten again.
+                        rmtime = int(path.getmtime(rname))
+                        if tmtime >= rmtime:
+                            chmod(rname, S_IWRITE)
+                            rfile = open(rname, 'w')
+                        else:
+                            # if timestamps of template and result differ, put
+                            # new result to another file.
+                            _log(0, 'File exists and is newer than template')
+                            from datetime import datetime
+                            ts = datetime.now().strftime('%y-%m-%d-%H-%M-%S')
+                            rfile = open(rname + ts, 'w')
+
+                rfile.write(''.join(res))
+                rfile.close()
+                res = []
+                _log(0, 'Result is written to {0}'.format(rfile.name))
+                # Often, a user starts to change the resulting file instead of
+                # changing the template, and all the changes went when the
+                # template is processed. To warn user if he tries to change the
+                # resulting file, the permission is set to 'read-only'.
+                utime(rfile.name, (tatime, tmtime))
+                chmod(rfile.name, S_IREAD)
+            else:
+                # when a template is included with the direct call to pre_pro,
+                # the last line of the included template ends with the new-line
+                # character. It is not needed.
+                res[-1] = res[-1][:-1]
+                # while res[-1] and res[-1][-1] in '\n\r':
+                #     res[-1] = res[-1][:-1]
+    if level == 'default':
+        # Return string for all input vlaues
         while res[-1] and res[-1][-1] in '\n\r':
             res[-1] = res[-1][:-1]
         return ''.join(res)
