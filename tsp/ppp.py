@@ -56,7 +56,9 @@ snippets in `template`.
         # values is given as the next argument. The remaining argument is
         # considered as the 1-st snippet to evaluate.
         # --'a 1 2 3 4' --'b 6 7 8' -'c = 5'
-        gld = {}
+
+        # Names and values of the parameter variables
+        clp = []
         preamb = ''
         for a in argv[2:]:
             if len(a) > 2 and a[:2] == '--':
@@ -69,13 +71,13 @@ snippets in `template`.
                     try:
                         vals = map(float, tokens)
                     except ValueError:
-                        vals = tokens
-                gld[vname] = vals
+                        vals = map(None, tokens)
+                clp.append((vname, vals))
             elif len(a) > 1 and a[:1] == '-':
                 # this is a snippet
                 preamb = a[1:]
 
-        pre_pro(fname=argv[1], level='main', preamb=preamb, **gld)
+        pre_pro(fname=argv[1], level='main', preamb=preamb, clp=clp)
 
 
 if __name__ == '__main__':
