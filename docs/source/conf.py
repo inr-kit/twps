@@ -184,7 +184,8 @@ mypreamble=open('preamble.tex', 'r').read()
 #
 #   u"""%
 #   \\usepackage{listings}
-#   \\renewcommand{\code}[1]{\\begin{lstlisting} #1 \\end{lstlisting}}
+#   \\newcommand{\code}[1]{\\begin{lstlisting} #1 \\end{lstlisting}}
+#   %\\renewcommand{\code}[1]{\\begin{lstlisting} #1 \\end{lstlisting}}
 #   """
 
 latex_elements = {
@@ -197,7 +198,7 @@ latex_elements = {
 # Additional stuff for the LaTeX preamble.
 'preamble': mypreamble,
 
-'fontpkg': '\\usepackage{uarial}', # the default COmputer Modern will be used.
+# 'fontpkg': '\\usepackage{uarial}', # the default COmputer Modern will be used.
 
 'babel': '\\usepackage[main=english]{babel}',
 # font encoding should be here, not in the additional preable:
