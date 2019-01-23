@@ -28,7 +28,7 @@ Script provides a command line interface to the TSP python package.
 
 from sys import argv
 from os import path
-from tsp import pre_pro
+from tsp import pre_pro, params
 
 
 def main():
@@ -51,7 +51,6 @@ snippets in `template`.
     if len(argv) < 2 or not path.exists(argv[1]):
         print msg
     else:
-        # TODO analyse the command line arguments.
         # All arguments starting with '--' are variable names, which list of
         # values is given as the next argument. The remaining argument is
         # considered as the 1-st snippet to evaluate.
@@ -62,21 +61,14 @@ snippets in `template`.
         preamb = ''
         for a in argv[2:]:
             if len(a) > 2 and a[:2] == '--':
-                # this is a list of variable names, preceeded with the var.name
-                tokens = a[2:].split()
-                vname = tokens.pop(0)
-                try:
-                    vals = map(int, tokens)
-                except ValueError:
-                    try:
-                        vals = map(float, tokens)
-                    except ValueError:
-                        vals = map(None, tokens)
-                clp.append((vname, vals))
+                nvi = params(a[2:])
+                clp.append(nvi)
             elif len(a) > 1 and a[:1] == '-':
                 # this is a snippet
                 preamb = a[1:]
 
+        print clp
+        print preamb
         pre_pro(fname=argv[1], level='main', preamb=preamb, clp=clp)
 
 
