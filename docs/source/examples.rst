@@ -30,7 +30,7 @@ appear in the resulting file.
         
         .. literalinclude:: examples/incl.txt
      
-      - .. literalinclude:: examples/incl1.t.res
+      - .. literalinclude:: examples/incl1.res.t
 
 The ``open`` function returns a file object that can be iterated line by line;
 in the example above, the ``for`` loop iterates over all lines of the opened
@@ -70,64 +70,61 @@ simply call this function and print out its result:
         
         .. literalinclude:: examples/itempl.txt
 
-      - .. literalinclude:: examples/incl2.t.res
+      - .. literalinclude:: examples/incl2.res.t
 
 In this example, the snippet code is removed from the resulting file by
 applying the ``-d`` snippet key. The snippet's output -- the result of
 preprocessing of the template ``itempl.txt`` is thus written instead of the
 snippet. To remove the extra new-line after the inserted template, the
-``print`` statement is ended with comma.
+``print`` statement is ended with comma. THe second snippet shows that the
+``print`` statement is actually not necessary while the snippet is substituted
+with its evaluation -- in this case with the result of preprocessing
+``itempl.txt``, but here the ``-d`` would prevent the output completely. 
 
       
 Multiple resulting files for parametric studies
 ------------------------------------------------
 Sometime it is necessary to prepare many input files differing from each other
-by some parameters. This task can be automatized without writing many template
+by some parameter(s). This task can be automatized without writing many template
 files or manually changing parameters in the template.
 
-Since one can process a template file from another template, one can call the
-main template from within a wrapper, where certain value of parameter is set.
-Let say we want to prepare three input files described by the following template,
-so that the input files differ only by the value of parameter ``N``::
-
-    ''
-    c Input file for 'N = 1'.
-    c Some lines depending on
-    c the value of 'N'.
-
-Three different input files can be created by sequentially changing the value
-of ``N`` in the template, processing the template and saving the resulting file
-under a unique name. Alternatively, one can process this template from another
-one, and write the result of processing not to standard output, but to a file.
-Let the above template is saved in the file ``main.t``. The wrapper template could look
-like:
-
+The command line argument preceeded with single minus sign is considered as a
+snippet and is processed before the template. Thus, one can set a variable in
+the command line and use it inside the template. Calling preprocessor on the
+same template with different command line snippet thus will result in different
+resulting files. 
 
 .. list-table::
     :header-rows: 1
 
-    * - Template 
-      - Generated files
-    
-    * - .. literalinclude:: examples/wrapper.t
-        
-      - The first generated file, ``input_V1``:
+    * - Template
+      - Result of ``ppp.py param1.t``
+      - Result of ``ppp.py -"a = 5"``
 
-        .. literalinclude:: examples/input_V1
+    * - .. literalinclude:: examples/param1.t
 
-        the last generated file, ``input_V3``:
+      - .. literalinclude:: examples/param1.res0.t
 
-        .. literalinclude:: examples/input_V3
+      - .. literalinclude:: examples/param1.res.t
 
-where ``main.t``  is
+When called without the snippet in the command line, the ``a`` variable is
+undefined and the snippet raises an error. In the second call ``a`` is defined
+in the command line snippet and the template processed without errors. The
+preprocessor output is shown in the next table:
 
-.. literalinclude:: examples/main.t
+.. list-table::
+    :header-rows: 1
 
-Note that the main template was slightly modified: the snippet defining the
-value of ``N`` is disabled by the ``-s`` key. It is not needed here anymore,
-since ``N`` is defined in the wrapper template. Processing the wrapper template
-with ``ppp.py`` will result in three files named ``input_V1``, ``input_V2`` and 
-``input_V3`` that will differ from each other only by the value of variable ``N``.
+    * - Result of ``ppp.py param1.t``
+      - Result of ``ppp.py -"a = 5"``
 
+    * - .. literalinclude:: examples/log.param1.t
 
+      - .. literalinclude:: examples/log.param1-.t
+
+One can also specify a list of values for a variable.
+
+.. todo:: 
+
+    Finish example with two lists of parameters.
 

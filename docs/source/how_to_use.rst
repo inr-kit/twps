@@ -3,8 +3,8 @@
 How to use TSP
 #################
 
-Basic usage of the TSP package is to simplify preparation of input decks
-for computer codes with limited syntax possibilities. Instead of writing an
+The basic TSP use is to simplify preparation of input decks
+for computer codes with limited syntax possibilities. Instead of writing the
 input deck directly, a template can be written that generally has syntax
 and structure of the input deck, but also can include Python code snippets,
 which will be replaced in the resulting file. Thus one can e.g. define and
@@ -13,20 +13,25 @@ permitted by the input file syntax of the target computer code. Ultimately,
 one gets possibility to use the whole legacy of Python when writing an input
 deck.
 
-The TSP preprocessor, an executable script called ``ppp.py``, is used to
-process templates. If a template file is stored in file ``input.t``, the following
-command::
+The TSP package provides the command line preprocessor, an executable script
+called ``ppp.py``.  For the template ``input.t``, the
+following command::
 
     $ ppp.py input.t
 
-will generate the file called ``input.t.res`` that contains the result of
+will generate the file called ``input.res.t`` that contains the result of
 processing.
+
+.. versionchanged:: 2.0.0
+
+   The resulting file name preserves the template's extension in order to 
+   have the same syntax highlighting for both files in the editor.
 
 The content of the template file is logically divided into two parts. The
 template's first line is used to set the delimiters for the 
 snippets and to specify some other options. The rest of the template file, i.e.
 everything from its second line till the end of file, defines the content
-of the resulting file (it is called below **template body**). It is
+of the resulting file (it is referred below as **template body**). Template body is 
 arbitrary text, interlaced with Python snippets, the latter must be marked
 with delimiters defined at the first line. Details see in Section
 :ref:`template-syntax`.
@@ -65,7 +70,7 @@ For details see [#]_.
 
 .. [#] http://docs.python.org/install/index.html.   
 
-The TSP package provides the script called ``ppp.py``. During the installation
+The TSP package provides script ``ppp.py``. During the installation
 process, the script will be copied into the directory where the Python
 interpreter is installed (under Windows it can be something like
 ``c:\Python27\Scripts``) and thus will be available at the command prompt. The
@@ -106,7 +111,7 @@ key that specifies details of how the snippet code and its
 evaluation/execution result appears in the resulting file. For available keys see :ref:`keys-label`.
 
 Inside snippets, the snippet delimiting characters cannot be used, in all other
-respects a snippet must represent valid Python code.
+respects a snippet must represent a valid Python code.
 
 
 .. _first-line:
@@ -127,10 +132,11 @@ following template ::
     ''
     Simple text and snippets: 'i=1', 'i'.
 
-In this template, the apostrophe, ``'``, is used to mark both the beginning and
-the end of the snippets. Any characters can be used as delimiters, although in the case of
-alphanumeric delimiters, a warning message will be issued. In the following template, character ``y`` is
-used to mark the snippet's begin, and characher ``z`` -- to mark the snippet's end:
+In this template, the apostrophe ``'`` is used to mark both the beginning and
+the end of the snippets. Any characters can be used as delimiters, but in case
+of an alphanumeric delimiter a warning message will be printed. In the
+following template, character ``y`` is used to mark the snippet's begin, and
+characher ``z`` -- to mark the snippet's end:
 
 .. list-table::
     :header-rows: 1
@@ -138,17 +144,18 @@ used to mark the snippet's begin, and characher ``z`` -- to mark the snippet's e
     * - Template
       - Resulting file
     * - .. literalinclude:: examples/alphanum.t
-      - .. literalinclude:: examples/alphanum.t.res
+      - .. literalinclude:: examples/alphanum.res.t
 
 This template is processed with the following warning message:
 
 .. literalinclude:: examples/log.alphanum.t
 
 
-After the delimiters are read from the first line, it is
-searched for a substring representing a valid key (possible keys see in
-:ref:`keys-label`). If such substring is found, it will be used as the default
-snippet key. The following example shows the first line specifying ``-l`` key as the default one::
+After the delimiters are read from the first line, it is searched for a
+substring representing a valid snippet formatting key (a list of possible keys
+see in :ref:`keys-label`). If such substring is found, it will be used as the
+default snippet key. The following example shows the first line specifying
+``-l`` key as the default one::
 
     -l''
     All snippets in this template will have the -l option, 
@@ -157,17 +164,18 @@ snippet key. The following example shows the first line specifying ``-l`` key as
 Only the first substring matching one of the available keys will be taken into account.    
 
 Additionally, in the  first line one can define a string of commenting
-characters. It is used to comment out multi-line snippets in the resulting
+characters. It is used to comment-out the multi-line snippets in the resulting
 file. The commenting string is the rest of the first line after stripping the
 trailing spaces, reading (and removing) the delimiting characters and reading
 (and removing) the default key.  The commenting string can be empty, as in the
-examples above, in this case the multi-line snippets will appear in the
-resulting file as is, without commenting out. In this case a warning is issued. 
+examples above; in this case the multi-line snippets will appear in the
+resulting file as is, without commenting them out. In this case a warning is
+issued. 
 
 Example 1
 ~~~~~~~~~~
 
-In the following example, the commenting string consists of character ``c``
+In the following example, the commenting string consists of ``c``
 followed by one space, the delimiters are quotes ``'``:
 
 .. list-table::
@@ -176,10 +184,10 @@ followed by one space, the delimiters are quotes ``'``:
     * - Template
       - Resulting file
     * - .. literalinclude:: examples/firstline1.t
-      - .. literalinclude:: examples/firstline1.t.res
+      - .. literalinclude:: examples/firstline1.res.t
 
-This template describes a part of an MCNP input file, where ``C`` or
-``c`` character at the first five positions of a line followed by a space means that
+This template is a part of the MCNP input file, where ``C`` or
+``c`` character at the first five positions followed by a space means that
 this line is a comment.
 
 Example 2
@@ -194,7 +202,7 @@ key is set to ``-l``:
     * - Template
       - Resulting file
     * - .. literalinclude:: examples/firstline2.t
-      - .. literalinclude:: examples/firstline2.t.res
+      - .. literalinclude:: examples/firstline2.res.t
 
 The commenting string is ``'c '``, the default key is ``-l`` and both
 delimiters are ``'``.  This example is similar to the previous one, except the
@@ -222,12 +230,12 @@ delimter is the back quote, `````, and the end delimiter is the single quote,
     * - Template
       - Resulting file
     * - .. literalinclude:: examples/firstline3.t
-      - .. literalinclude:: examples/firstline3.t.res
+      - .. literalinclude:: examples/firstline3.res.t
 
-This example illustrates that the default key and the commenting string can be 
-specified in arbitrary order. Note that only the first substring that matches the key pattern is
-taken into account. The rest of the line (after removing the delimiters and the default key)
-is considered as the commenting string.
+This example illustrates that the default key and the commenting string can be
+specified in arbitrary order. Note that only the first substring that matches
+the key pattern is taken into account. The rest of the line (after removing the
+delimiters and the default key) is considered as the commenting string.
 
 
 .. _snippets:   
@@ -249,7 +257,7 @@ recognized by the preprocessor as a snippet:
     * - Template
       - Resulting file
     * - .. literalinclude:: examples/snippet1.t
-      - .. literalinclude:: examples/snippet1.t.res
+      - .. literalinclude:: examples/snippet1.res.t
 
 A snippet prefix consisting of the minus sign followed by a letter can have
 special meaning. If it coincides with one of the snippet keys (see in
@@ -263,7 +271,7 @@ snippet prefixes:
     * - Template 
       - Resulting file 
     * - .. literalinclude:: examples/keys2.t
-      - .. literalinclude:: examples/keys2.t.res
+      - .. literalinclude:: examples/keys2.res.t
 
 The snippet delimiter characters cannot be used inside snippets, since they
 would be considered by the preprocessor as the beginning or end of the snippet.
@@ -280,7 +288,6 @@ calls the :func:`pre_pro` function to process another template, all
 variables defined in the processed template will become available in the
 "calling" template. 
     
-
 
 
 
@@ -323,18 +330,18 @@ after the snippet will be shifted in the resulting file:
     * - Template 
       - Resulting file 
     * - .. literalinclude:: examples/eva1.t
-      - .. literalinclude:: examples/eva1.t.res
+      - .. literalinclude:: examples/eva1.res.t
 
     
 Note, in the template's 3-rd line, the snippet code ``'c'`` takes 3 characters
 (the delimiters are counted as well) and it is substituted with a string of 6 characters
-``abcdef`` in the result. In the 9-th line the snippet ``'LongVariable'``
+``abcdef`` in the result. On line 9, the snippet ``'LongVariable'``
 that takes 14 characters in the template, is replaced with only one character ``'a'``.
 
-If the evaluation result is shorter than the snippet code, the default behaviour
-can be changed using :ref:`keys-label`.
-If the resulting string and the snippet code have the same length, the text
-after the snippet will remain its position.
+If the evaluation result is shorter than the snippet code, the default
+behaviour can be changed using :ref:`keys-label`.  If the resulting string and
+the snippet code have the same length, the text after the snippet will remain
+its position.
 
 
 Execution examples
@@ -349,12 +356,12 @@ the third snippet that contains the ``print`` statement, is again executed:
     * - Template 
       - Resulting file
     * - .. literalinclude:: examples/exe1.t
-      - .. literalinclude:: examples/exe1.t.res
+      - .. literalinclude:: examples/exe1.res.t
 
-Note that by default, the print [#]_ Python statement adds the new-line character
+Note that the ``print`` [#]_ Python statement adds by default the new-line character
 at the end of the printed line, therefore in the above example the rest of the
-line after the last snippet jumped onto the next line. To avoid the new-line
-character, the comma-ended variant of the print statement should be used, e.g.
+line after the last snippet jumps onto the next line. To avoid the new-line
+character, the comma-ended variant of ``print`` can be used, e.g.
 ``'print a,'``.
 
 .. [#] http://docs.python.org/reference/simple_stmts.html#print
@@ -365,8 +372,8 @@ character, the comma-ended variant of the print statement should be used, e.g.
 Multi-line snippets
 -------------------
 
-A snippet can take several lines, in this case it is always executed. The usual
-indentation rules for Python code should apply to the multi-line snippets.
+A snippet can take several lines, in this case it is always executed. The standard Python 
+indentation rules apply to the multi-line snippets.
 Consider the following template:
 
 
@@ -376,7 +383,7 @@ Consider the following template:
     * - Template
       - Resulting file 
     * - .. literalinclude:: examples/mline1.t
-      - .. literalinclude:: examples/mline1.t.res
+      - .. literalinclude:: examples/mline1.res.t
 
 
 The multi-line snippet here has 4 lines. The first line of the snippet is
@@ -400,9 +407,9 @@ standard output will be generated):
     * - Template 
       - Resulting file 
     * - .. literalinclude:: examples/mline2.t
-      - .. literalinclude:: examples/mline2.t.res
+      - .. literalinclude:: examples/mline2.res.t
 
-This template would produce the following output:
+This template will produce the following output:
 
 .. literalinclude:: examples/log.mline2.t
 
@@ -414,14 +421,14 @@ The right way to put the code into the first snippet line is:
     * - Template 
       - Resulting file 
     * - .. literalinclude:: examples/mline3.t
-      - .. literalinclude:: examples/mline3.t.res
+      - .. literalinclude:: examples/mline3.res.t
 
 Note that this form is visualy less clear than in the first example in this
 section, so it is better to avoid putting any code to the first line of the
 multi-line snippet.
 
 Multi-line snippets are always executed. By default, the code of the multi-line
-snippets is repeated in the resulting file (for the other behaviour use ``-d`` key,
+snippets is repeated in the resulting file (unless ``-d`` key is given,
 see :ref:`keys-label`), and if any standard output is generated by the snippet,
 it is placed right after the snippet's end delimiter, on the same line.
 
@@ -438,7 +445,7 @@ used to comment mulitline snippets:
     * - Template 
       - Resulting file 
     * - .. literalinclude:: examples/mline4.t
-      - .. literalinclude:: examples/mline4.t.res
+      - .. literalinclude:: examples/mline4.res.t
 
 The string of commenting  characters defined in the templates's first line can
 be empty. In this case a warning message will be printed and multi-line
@@ -454,7 +461,7 @@ commented out, like in the following example:
     * - Template 
       - Resulting file 
     * - .. literalinclude:: examples/mline5.t
-      - .. literalinclude:: examples/mline5.t.res
+      - .. literalinclude:: examples/mline5.res.t
 
 Sometimes, it is desired to put the snippet output on extra lines. To do this, 
 use additional ``print`` statements in the snippet code. The above example would be:
@@ -465,7 +472,7 @@ use additional ``print`` statements in the snippet code. The above example would
     * - Template 
       - Resulting file 
     * - .. literalinclude:: examples/mline6.t
-      - .. literalinclude:: examples/mline6.t.res
+      - .. literalinclude:: examples/mline6.res.t
 
 
 .. _keys-label:
@@ -516,6 +523,6 @@ The meaning of the keys should be clear form the following example:
     * - Template 
       - Resulting file 
     * - .. literalinclude:: examples/keys1.t
-      - .. literalinclude:: examples/keys1.t.res
+      - .. literalinclude:: examples/keys1.res.t
 
 
