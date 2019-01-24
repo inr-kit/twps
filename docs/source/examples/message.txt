@@ -5,12 +5,20 @@ $ ppp.py
 
 Usage:
 
-> ppp.py template [snippet]
+> ppp.py [-'snippet'] [--'var list_of_values'] template
 
 where `template' is a text file containing python snippets.  Snippets are
 evaluated/executed and the snippet code is replaced with the result of
 evaluation/execution. The resulting file is saved to `template.res'.
 
-When optional `snippet` is given, it is evaluated or executed before the
-snippets in `template`.
+Optional argument starting with single `-` is a snippet evaluated before
+processing the template. Thus, one can e.g. define in the command line a
+parameter used later in the template.
+
+Optional argument(s) starting with two minus signs, `--`, define variables for
+parametric studies. The string following `--` (possibly protected with single
+or double quotes) defines the name of the variable and the list of values this
+variable takes. The template is processed for each variable's value; the
+resulting file is written to `template._i1_i2_..._iN`, where i1 is the index of
+the 1-st variable's value, i2 -- the index of the second variable's value etc.
 

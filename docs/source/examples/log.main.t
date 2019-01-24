@@ -1,7 +1,9 @@
-Process file main.t
-WARNING: string of commenting characters
-         is empty.  Multi-line  snippets
-         will not be commented out
-WARNING: Snippet on line 4 caused evaluation error:
-         name 'N' is not defined
-Result is written to main.t.res
+Message 0 from main.t Start processing
+Message 1 from main.t
+    line 1 WARNING:
+    string of commenting characters is empty.
+    Multi-line  snippets remain uncommented.
+Message 1 from main.t
+    line 4 WARNING: Snippet caused evaluation error
+Message 1 from main.t name 'N' is not defined
+Message 0 from main.t Result is written to main.res.t

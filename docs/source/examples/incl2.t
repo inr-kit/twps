@@ -9,3 +9,4 @@ Note that variable A defined in the
 included template is available here:
 A = 'A'.
 
+'pre_pro("itempl.txt")'

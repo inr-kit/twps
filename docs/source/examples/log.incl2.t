@@ -1,6 +1,12 @@
-Process file incl2.t
-Process file itempl.txt
-WARNING: string of commenting characters
-         is empty.  Multi-line  snippets
-         will not be commented out
-Result is written to incl2.t.res
+Message 0 from incl2.t Start processing
+Message 0 from itempl.txt Start processing
+Message 1 from itempl.txt
+    line 1 WARNING:
+    string of commenting characters is empty.
+    Multi-line  snippets remain uncommented.
+Message 0 from itempl.txt Start processing
+Message 1 from itempl.txt
+    line 1 WARNING:
+    string of commenting characters is empty.
+    Multi-line  snippets remain uncommented.
+Message 0 from incl2.t Result is written to incl2.res.t
