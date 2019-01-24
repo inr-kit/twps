@@ -17,12 +17,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Script provides a command line interface to the TSP python package.
+Script provides command line interface to the TSP python package.
 
 """
 
 # at
-# Author: Anton Travleev, anton.travleev@kit.edu
+# Author: Anton Travleev, anton.travleev@gmail.com
 # Developed at INR, Karlsruhe Institute of Technology
 # at
 
@@ -38,17 +38,25 @@ def main():
 
 Usage:
 
-> {} template [snippet]
+> {} [-'snippet'] [--'var list_of_values'] template
 
 where `template' is a text file containing python snippets.  Snippets are
 evaluated/executed and the snippet code is replaced with the result of
 evaluation/execution. The resulting file is saved to `template.res'.
 
-When optional `snippet` is given, it is evaluated or executed before the
-snippets in `template`.
+Optional argument starting with single `-` is a snippet evaluated before
+processing the template. Thus, one can e.g. define in the command line a
+parameter used later in the template.
+
+Optional argument(s) starting with two minus signs, `--`, define variables for
+parametric studies. The string following `--` (possibly protected with single
+or double quotes) defines the name of the variable and the list of values this
+variable takes. The template is processed for each variable's value; the
+resulting file is written to `template._i1_i2_..._iN`, where i1 is the index of
+the 1-st variable's value, i2 -- the index of the second variable's value etc.
 """.format(path.basename(argv[0]))
 
-    if len(argv) < 2 or not path.exists(argv[1]):
+    if len(argv) < 2 or '--help' in ''.join(argv[1:]).lower():
         print msg
     else:
         # TODO analyse the command line arguments.
@@ -60,7 +68,8 @@ snippets in `template`.
         # Names and values of the parameter variables
         clp = []
         preamb = ''
-        for a in argv[2:]:
+        templates = []
+        for a in argv[1:]:
             if len(a) > 2 and a[:2] == '--':
                 # this is a list of variable names, preceeded with the var.name
                 tokens = a[2:].split()
@@ -76,8 +85,13 @@ snippets in `template`.
             elif len(a) > 1 and a[:1] == '-':
                 # this is a snippet
                 preamb = a[1:]
+            elif path.exists(a):
+                templates.append(a)
+            else:
+                print 'Skipping argument', repr(a)
 
-        pre_pro(fname=argv[1], level='main', preamb=preamb, clp=clp)
+        for t in templates:
+            pre_pro(fname=t, level='main', preamb=preamb, clp=clp)
 
 
 if __name__ == '__main__':

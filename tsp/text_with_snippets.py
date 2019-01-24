@@ -131,12 +131,12 @@ sys.path.insert(0, getcwd())
 
 # Options that modify positioning of snippet's result.
 _OptionsList = [
-    '-r',  # adjust right
-    '-l',  # adjust left
-    '-c',  # center
-    '-d',  # delete snippet code, i.e. put to resulting file only result
-    '-s',  # skip the snippet evaluation. Just leave its text representation
-    '-D',  # default. Do not preserve snippet place.
+    'r',  # adjust right
+    'l',  # adjust left
+    'c',  # center
+    'd',  # delete snippet code, i.e. put to resulting file only result
+    's',  # skip the snippet evaluation. Just leave its text representation
+    'D',  # default. Do not preserve snippet place.
     ]
 
 
@@ -167,9 +167,12 @@ def firstline(l1, _log):
         # Read the default option, if given:
         if len(l1) >= 2:
             # 1st line can contain the default option in its first two chars.
-            if l1[:2] in _OptionsList:
-                TemplateOpt = l1[:2]
-                l1 = l1[2:]
+            # Find the 1-st match of the option:
+            r = re.compile('-[{}]'.format(''.join(_OptionsList)))
+            f = r.findall(l1)
+            if f:
+                TemplateOpt = f[0]
+                l1 = l1.replace(TemplateOpt, '')
         # read the commenting string, if given:
         if l1:
             Cchar = l1[:]
@@ -217,7 +220,7 @@ def removeOpt(t, default):
     """
     # Find options for the next snippet, remember them and remove them
     # from result:
-    if t[-2:] in _OptionsList:
+    if len(t) > 1 and t[-2] == '-' and t[-1] in _OptionsList:
         SnippetOpt = t[-2:]
         if SnippetOpt == '-d':
             # just remove option from result. The following snippet

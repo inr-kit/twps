@@ -33,3 +33,13 @@ pre_pro() function can be used.
 
 from text_with_snippets import pre_pro
 from utils import params
+
+# TSP version. Used in setup.py and in docs
+# Numbering: X.Y.Z, where
+#    X -- major version. Different major versions are not back-compatible.
+#         New major version number, when code is rewritten
+#
+#    Y -- minor version. New minor version, when new function(s) added.
+#
+#    Z -- update, new update number when a bug is fixed.
+__version__ = "2.0.0"
