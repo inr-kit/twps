@@ -28,7 +28,7 @@ Script provides command line interface to the TSP python package.
 
 from sys import argv
 from os import path
-from tsp import pre_pro
+from tsp import pre_pro, params
 
 
 def main():
@@ -59,7 +59,6 @@ the 1-st variable's value, i2 -- the index of the second variable's value etc.
     if len(argv) < 2 or '--help' in ''.join(argv[1:]).lower():
         print msg
     else:
-        # TODO analyse the command line arguments.
         # All arguments starting with '--' are variable names, which list of
         # values is given as the next argument. The remaining argument is
         # considered as the 1-st snippet to evaluate.
@@ -71,17 +70,8 @@ the 1-st variable's value, i2 -- the index of the second variable's value etc.
         templates = []
         for a in argv[1:]:
             if len(a) > 2 and a[:2] == '--':
-                # this is a list of variable names, preceeded with the var.name
-                tokens = a[2:].split()
-                vname = tokens.pop(0)
-                try:
-                    vals = map(int, tokens)
-                except ValueError:
-                    try:
-                        vals = map(float, tokens)
-                    except ValueError:
-                        vals = map(None, tokens)
-                clp.append((vname, vals))
+                nvi = params(a[2:])
+                clp.append(nvi)
             elif len(a) > 1 and a[:1] == '-':
                 # this is a snippet
                 preamb = a[1:]
@@ -90,6 +80,10 @@ the 1-st variable's value, i2 -- the index of the second variable's value etc.
             else:
                 print 'Skipping argument', repr(a)
 
+        if clp:
+            print 'Parameters:', clp
+        if preamb:
+            print 'Command-line snippet:', preamb
         for t in templates:
             pre_pro(fname=t, level='main', preamb=preamb, clp=clp)
 
