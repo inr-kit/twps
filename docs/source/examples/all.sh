@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-rm -rf *.res
+rm -rf *.res.t
 rm -rf log.*.t
 
 echo "$ ppp.py" > message.txt
