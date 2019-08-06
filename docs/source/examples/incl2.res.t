@@ -16,3 +16,12 @@ Note that variable A defined in the
 included template is available here:
 A = 5.
 
+    Included templates can have 
+    their own delimiters.
+	
+    For better representation, the 
+    lines of the included template 
+    are indented.
+
+    Varible A is defined here:
+    /A=5/.

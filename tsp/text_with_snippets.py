@@ -59,32 +59,7 @@ import os
 import traceback
 from os import path, chmod, getcwd, utime
 from stat import S_IREAD, S_IWRITE
-
-
-def variants(gls):
-    """
-    Yields all possible variants of the parameter values.
-
-    ``gls`` is a list of tuples (name, vals), where ``name`` is the parameter's
-    name and ``vals`` is the list of values this parameter takes.
-
-    The iterator yields idx, Ntot, Plst, where ``idx`` is a tuple of parameter
-    values, ``Ntot`` is the total number of variants, and ``Plst`` is a list of
-    parameter names and correspondent values. This list can be passed to
-    ``dict`` constructor to obtain a dictionary defining the scope with the
-    current set of parameter values.
-    """
-    if gls:
-        k, vals = gls[0]
-        n = 0
-        m = len(vals)
-        for v in vals:
-            for t in variants(gls[1:]):
-                yield (n, ) + t[0], m*t[1], ((k, v),) + t[2]
-            n += 1
-    else:
-        yield ((), 1, ())
-
+from tsp.utils import variants
 
 # Log level:
 #       0 -- errors
@@ -156,12 +131,12 @@ sys.path.insert(0, getcwd())
 
 # Options that modify positioning of snippet's result.
 _OptionsList = [
-    '-r',  # adjust right
-    '-l',  # adjust left
-    '-c',  # center
-    '-d',  # delete snippet code, i.e. put to resulting file only result
-    '-s',  # skip the snippet evaluation. Just leave its text representation
-    '-D',  # default. Do not preserve snippet place.
+    'r',  # adjust right
+    'l',  # adjust left
+    'c',  # center
+    'd',  # delete snippet code, i.e. put to resulting file only result
+    's',  # skip the snippet evaluation. Just leave its text representation
+    'D',  # default. Do not preserve snippet place.
     ]
 
 
@@ -190,11 +165,14 @@ def firstline(l1, _log):
         Schar, Echar = l1[-2:]
         l1 = l1[:-2]
         # Read the default option, if given:
-        if len(l1) >=2:
+        if len(l1) >= 2:
             # 1st line can contain the default option in its first two chars.
-            if l1[:2] in _OptionsList:
-                TemplateOpt = l1[:2]
-                l1 = l1[2:]
+            # Find the 1-st match of the option:
+            r = re.compile('-[{}]'.format(''.join(_OptionsList)))
+            f = r.findall(l1)
+            if f:
+                TemplateOpt = f[0]
+                l1 = l1.replace(TemplateOpt, '')
         # read the commenting string, if given:
         if l1:
             Cchar = l1[:]
@@ -242,7 +220,7 @@ def removeOpt(t, default):
     """
     # Find options for the next snippet, remember them and remove them
     # from result:
-    if t[-2:] in _OptionsList:
+    if len(t) > 1 and t[-2] == '-' and t[-1] in _OptionsList:
         SnippetOpt = t[-2:]
         if SnippetOpt == '-d':
             # just remove option from result. The following snippet
@@ -368,7 +346,7 @@ def pre_pro(fname, level='default', preamb='', clp=[], **kwargs):
     clp = clp + kwargs.items()
     res = []  # resulting strings.
     _log(3, 'Complete set of parameters: {}'.format(clp))
-    for pidx, Nprm, Plst in variants(clp):
+    for pidx, Plst in variants(clp):
         _log(3, 'Current parameters: ' + repr(pidx) + repr(Plst))
         gld.update(dict(Plst))
         _log(3, 'Eval/exec scope: {}'.format(gld))
@@ -559,8 +537,6 @@ def pre_pro(fname, level='default', preamb='', clp=[], **kwargs):
             # the last line of the included template ends with the new-line
             # character. It is not needed.
             res[-1] = res[-1][:-1]
-            # while res[-1] and res[-1][-1] in '\n\r':
-            #     res[-1] = res[-1][:-1]
     if level == 'default':
         # Return string for all input vlaues
         while res[-1] and res[-1][-1] in '\n\r':

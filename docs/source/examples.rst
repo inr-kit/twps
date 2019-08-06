@@ -76,7 +76,10 @@ In this example, the snippet code is removed from the resulting file by
 applying the ``-d`` snippet key. The snippet's output -- the result of
 preprocessing of the template ``itempl.txt`` is thus written instead of the
 snippet. To remove the extra new-line after the inserted template, the
-``print`` statement is ended with comma.
+``print`` statement is ended with comma. THe second snippet shows that the
+``print`` statement is actually not necessary while the snippet is substituted
+with its evaluation -- in this case with the result of preprocessing
+``itempl.txt``, but here the ``-d`` would prevent the output completely. 
 
       
 Multiple resulting files for parametric studies
@@ -142,5 +145,7 @@ line with the one-dash argument. For a
    with ``ppp.py`` will result in three files named ``input_V1``, ``input_V2`` and 
    ``input_V3`` that will differ from each other only by the value of variable ``N``.
 
+.. todo:: 
 
+    Finish example with two lists of parameters.
 

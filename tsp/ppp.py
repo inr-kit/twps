@@ -17,18 +17,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Script provides a command line interface to the TSP python package.
+Script provides command line interface to the TSP python package.
 
 """
 
 # at
-# Author: Anton Travleev, anton.travleev@kit.edu
+# Author: Anton Travleev, anton.travleev@gmail.com
 # Developed at INR, Karlsruhe Institute of Technology
 # at
 
 from sys import argv
 from os import path
-from tsp import pre_pro
+from tsp import pre_pro, params
 
 
 def main():
@@ -57,10 +57,9 @@ are given, they are interpreted as nested loop.
 
 """.format(path.basename(argv[0]))
 
-    if len(argv) < 2 or not path.exists(argv[1]):
+    if len(argv) < 2 or '--help' in ''.join(argv[1:]).lower():
         print msg
     else:
-        # TODO analyse the command line arguments.
         # All arguments starting with '--' are variable names, which list of
         # values is given as the next argument. The remaining argument is
         # considered as the 1-st snippet to evaluate.
@@ -69,24 +68,25 @@ are given, they are interpreted as nested loop.
         # Names and values of the parameter variables
         clp = []
         preamb = ''
-        for a in argv[2:]:
+        templates = []
+        for a in argv[1:]:
             if len(a) > 2 and a[:2] == '--':
-                # this is a list of variable names, preceeded with the var.name
-                tokens = a[2:].split()
-                vname = tokens.pop(0)
-                try:
-                    vals = map(int, tokens)
-                except ValueError:
-                    try:
-                        vals = map(float, tokens)
-                    except ValueError:
-                        vals = map(None, tokens)
-                clp.append((vname, vals))
+                nvi = params(a[2:])
+                clp.append(nvi)
             elif len(a) > 1 and a[:1] == '-':
                 # this is a snippet
                 preamb = a[1:]
+            elif path.exists(a):
+                templates.append(a)
+            else:
+                print 'Skipping argument', repr(a)
 
-        pre_pro(fname=argv[1], level='main', preamb=preamb, clp=clp)
+        if clp:
+            print 'Parameters:', clp
+        if preamb:
+            print 'Command-line snippet:', preamb
+        for t in templates:
+            pre_pro(fname=t, level='main', preamb=preamb, clp=clp)
 
 
 if __name__ == '__main__':
