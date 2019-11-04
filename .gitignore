@@ -1,5 +1,9 @@
-tsp.egg-info/*
+tsp.egg-info
 
-tsp/*.pyc
+*.pyc
 
 docs/build/*
+
+MANIFEST
+
+dist
