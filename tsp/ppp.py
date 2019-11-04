@@ -52,8 +52,8 @@ One can provide variable names and set of their values. The template will be
 processed  with all possible combinations. For example, if one argument
 starting with two dashes is given, i.e. --'v 1 2 3', three resulting files will
 be created, named `template._0.t', `template._1.t' etc. The `v' variable will
-be set qonsecutively to each of the given values. If more than one `--' options
-are given, they are interpreted as nested loop.
+be set subsequently to each of the given values. If more than one `--' options
+are given, they constitute nested loops.
 
 """.format(path.basename(argv[0]))
 
