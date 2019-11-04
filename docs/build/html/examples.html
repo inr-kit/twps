@@ -1,0 +1,270 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Examples &#8212; tsp package 1.2.b documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Conclusion and acknowledgement" href="conclusion.html" />
+    <link rel="prev" title="How to use TSP" href="how_to_use.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="conclusion.html" title="Conclusion and acknowledgement"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="how_to_use.html" title="How to use TSP"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">tsp package 1.2.b documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="examples">
+<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
+<p>This section shows how the TSP package can be applied to tasks that often arise during preparation of
+complex input files. This covers inclusion of external files and templates and generation of a set of input
+files that differ by some parameter (for e.g. parametric studies).</p>
+<div class="section" id="inclusion-of-external-files">
+<h2>Inclusion of external files<a class="headerlink" href="#inclusion-of-external-files" title="Permalink to this headline">¶</a></h2>
+<p>The TSP package provides no special mechanism to include external files into the resulting
+file, however, one can use standard Python capabilities. In the following
+example, an external file is read by the <code class="docutils literal notranslate"><span class="pre">open</span></code> <a class="footnote-reference" href="#id2" id="id1">[1]</a> Python function and its
+content is printed to the standard output. Since the standard output of the
+snippet execution appears right after the snippet code, the file content will
+appear in the resulting file.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="http://docs.python.org/library/functions.html#open">http://docs.python.org/library/functions.html#open</a></td></tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+A snippet to put the content of the
+external file &quot;incl.txt&quot; into the 
+resulting file. For details see 
+description of the open() Python 
+function. &#39;
+    print
+    for l in open(&quot;incl.txt&quot;, &quot;r&quot;):
+        print l,&#39;        
+
+Or as one-liner:
+&#39;print; print open(&quot;incl.txt&quot;).read()&#39;
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">incl.txt</span></code> has the following content:</p>
+<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>1 This is the content
+2 of file
+3 incl.txt
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>A snippet to put the content of the
+external file &quot;incl.txt&quot; into the 
+resulting file. For details see 
+description of the open() Python 
+function. &#39;
+c     print
+c     for l in open(&quot;incl.txt&quot;, &quot;r&quot;):
+c         print l,&#39;
+1 This is the content
+2 of file
+3 incl.txt        
+
+Or as one-liner:
+&#39;print; print open(&quot;incl.txt&quot;).read()&#39;
+1 This is the content
+2 of file
+3 incl.txt
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The <code class="docutils literal notranslate"><span class="pre">open</span></code> function returns a file object that can be iterated line by line;
+in the example above, the <code class="docutils literal notranslate"><span class="pre">for</span></code> loop iterates over all lines of the opened
+file.  The file is opened with <code class="docutils literal notranslate"><span class="pre">&quot;r&quot;</span></code> key that means that the file is open
+only for reading. Each line of the opened file is printed out. Note that the
+print statement ends with the comma, this prevents extra empty lines in
+the output. The snippet starts with the empty print statement, it adds a new
+line just after the snippet’s end marker in the resulting file, so that the
+included file starts on the new line.</p>
+</div>
+<div class="section" id="inclusion-of-other-templates">
+<h2>Inclusion of other templates<a class="headerlink" href="#inclusion-of-other-templates" title="Permalink to this headline">¶</a></h2>
+<p>While in the above example inclusion of text file without any preprocessing is
+shown, often it is necessary to include another template that needs first to be
+preprocessed. To accomplish this task one needs to use directly the function
+<code class="xref py py-func docutils literal notranslate"><span class="pre">pre_pro()</span></code> from the module <code class="xref py py-mod docutils literal notranslate"><span class="pre">text_with_snippets</span></code> of the TSP package.
+In simple situations this function is called by the preprocessor <code class="docutils literal notranslate"><span class="pre">ppp.py</span></code> so
+that a user does not use it directly; this example shows how to use this
+function directly in a template (or in a Python script).</p>
+<p>The <code class="xref py py-func docutils literal notranslate"><span class="pre">pre_pro()</span></code> function  takes the name of a template file as argument and
+returns the corresponding resulting file content as a multiline string.  This
+function is imported by the script <code class="docutils literal notranslate"><span class="pre">ppp.py</span></code> and thus is accessible inside
+snippets by default. To include the result of evaluation of another template,
+simply call this function and print out its result:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+Example of including another template.
+File &quot;itempl.txt&quot; is first preprocessed
+and its result is inserted here:
+
+-d&#39;print pre_pro(&quot;itempl.txt&quot;),&#39;
+
+Note that variable A defined in the 
+included template is available here:
+A = &#39;A&#39;.
+
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">itempl.txt</span></code> has the following content:</p>
+<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>//
+    Included templates can have 
+    their own delimiters.
+	
+    For better representation, the 
+    lines of the included template 
+    are indented.
+
+    Varible A is defined here:
+    /A=5/.
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>Example of including another template.
+File &quot;itempl.txt&quot; is first preprocessed
+and its result is inserted here:
+
+    Included templates can have 
+    their own delimiters.
+	
+    For better representation, the 
+    lines of the included template 
+    are indented.
+
+    Varible A is defined here:
+    /A=5/.
+
+Note that variable A defined in the 
+included template is available here:
+A = 5.
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>In this example, the snippet code is removed from the resulting file by
+applying the <code class="docutils literal notranslate"><span class="pre">-d</span></code> snippet key. The snippet’s output – the result of
+preprocessing of the template <code class="docutils literal notranslate"><span class="pre">itempl.txt</span></code> is thus written instead of the
+snippet. To remove the extra new-line after the inserted template, the
+<code class="docutils literal notranslate"><span class="pre">print</span></code> statement is ended with comma.</p>
+</div>
+<div class="section" id="multiple-resulting-files-for-parametric-studies">
+<h2>Multiple resulting files for parametric studies<a class="headerlink" href="#multiple-resulting-files-for-parametric-studies" title="Permalink to this headline">¶</a></h2>
+<p>Sometime it is necessary to prepare many input files differing from each other
+by some parameters. Also one can organize any looping in a template, there are
+special command line arguments that can be used to define parameter names and
+their set of values.</p>
+<p>One possibility is to specify a snippet defining parameter’s value in the command
+line with the one-dash argument. For a</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_use.html">How to use TSP</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#inclusion-of-external-files">Inclusion of external files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inclusion-of-other-templates">Inclusion of other templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multiple-resulting-files-for-parametric-studies">Multiple resulting files for parametric studies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="conclusion.html">Conclusion and acknowledgement</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="how_to_use.html"
+                        title="previous chapter">How to use TSP</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="conclusion.html"
+                        title="next chapter">Conclusion and acknowledgement</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="conclusion.html" title="Conclusion and acknowledgement"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="how_to_use.html" title="How to use TSP"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">tsp package 1.2.b documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, Anton Travleev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,242 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Introduction &#8212; tsp package 1.2.b documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="How to use TSP" href="how_to_use.html" />
+    <link rel="prev" title="TSP package documentation" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="how_to_use.html" title="How to use TSP"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="TSP package documentation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">tsp package 1.2.b documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Application of computational codes often implies preparation of text input
+files. In a simple case, an input file can be written by hands, but often the
+amount of details to be passed to a code makes an input file long and complex
+so that the write-by-hands approach becomes almost impossible. Some codes
+provide means to simplify preparation of input files, for example, by allowing
+inclusion of external files, or by providing syntax to define variables that
+can be referenced later instead of explicit input data, but usually such
+possibilities are rather limited.</p>
+<p>A widely used approach to create complex input files is to write a program that
+generates it. This approach has some drawbacks. Input files generated
+programmatically are usually very case-specific and even a small extension of
+the computational model might imply considerable changes in the program.
+Another drawback is that some parts of an input file can be rather simple and
+it is much more convenient to write it by hands than to write a programm that
+generate these simple parts.</p>
+<p>Another approach that partly resolves the latter problem is to use templates.
+The generating program computes necessary data and inserts them into a template
+file that is prepared in advance. Thus, some parts of the input file can be
+written by hands to the template, and generation of the rest can be coded. In
+this approach one needs to define an algorithm to find places for insertion.
+The simplets way – to insert something into a predefined line and position,
+makes it difficult to change the template later on. More sophisticated algorithms,
+such as using particular strings in the template file to be replaced by the
+program are difficult to apply especially if the amount of inserted data is
+large. Another drawback of this approach is that information needed to write
+the input file is located at at least two different places: in the template
+file and in the program.</p>
+<p>We propose a concept that is an extension of the concept of templates and
+resembles the idea of literate programming .
+Accoring to this concept, the template file contains both parts written by
+hands that is transferred to the input file unchanged, and parts containing
+code chunks that will be substituted by the result of their evaluation during
+preprocessing. Thus, the template file contains all the information necessary
+to produce an input file, and places where evaluation result must be inserted
+is defined naturally by the place where the code chunks are found in the
+template.</p>
+<p>Software that supports this concept is implemented in the Python programming
+language . It is distributed as a Python package
+called TSP (stands for “Text with Snippets Preprocessor”) and can be installed
+onto any machine where Python is installed (tested on Windows 7 and Linux OS).
+The TSP package provides an executable that takes a text file as input,
+searches for pieces of Python code in it, executes these code chunks  and writes an
+output text file that is a copy of the input text file, but with the Python
+code pieces substituted with the result of their evaluation.</p>
+<p>This report explains the installation procedure of the TSP package, describes
+the syntax of the template file and gives some examples of the usage of TSP.</p>
+<p>In the rest of the report, the following terminology is used. A file containing
+text and Python code pieces is called <strong>template file</strong>, or just <strong>template</strong>. Pieces
+of Python code inside a template are called <strong>snippets</strong>.  The output file
+generated by processing of an template, is called <strong>resulting file</strong>. The script
+provided by the TSP package that reads a template file and generates
+correspondent resulting file, is called <strong>preprocessor</strong>.</p>
+<p>To illustrate what the TSP package can be used for, consider the example that shows
+the template file on the left and the resulting file on the right:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;&#39;
+This is arbitrary text, and this is 
+a snippet: &#39;pi=3.14159&#39;, delimited 
+with characters from the first line.
+In this snippet, the variable pi is 
+defined. After a variable is defined, 
+it can be referenced: &#39;pi*2&#39;.
+
+A snippet can take several lines. It 
+is like a python script, but saved 
+directly in the template file. It can
+access variables defined in previous
+snippets. 
+&#39;
+from math import cos
+print
+for x in [0, 0.3, 0.7, 1.]:
+    print &quot;%6f %9.2e&quot; % (x, cos(pi*x))
+&#39;
+
+The standard output generated by a 
+snippet, if any, will be inserted 
+into the resulting file right after
+the snippet.
+ 
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>This is arbitrary text, and this is 
+a snippet: &#39;pi=3.14159&#39;, delimited 
+with characters from the first line.
+In this snippet, the variable pi is 
+defined. After a variable is defined, 
+it can be referenced: 6.28318.
+
+A snippet can take several lines. It 
+is like a python script, but saved 
+directly in the template file. It can
+access variables defined in previous
+snippets. 
+&#39;
+from math import cos
+print
+for x in [0, 0.3, 0.7, 1.]:
+    print &quot;%6f %9.2e&quot; % (x, cos(pi*x))
+&#39;
+0.000000  1.00e+00
+0.300000  5.88e-01
+0.700000 -5.88e-01
+1.000000 -1.00e+00
+
+
+The standard output generated by a 
+snippet, if any, will be inserted 
+into the resulting file right after
+the snippet.
+ 
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The template’s first line contains two quotes, <code class="docutils literal notranslate"><span class="pre">'</span></code>,
+they will be used in the rest of the template to define the beginning and end of
+snippets. The first line is never copied to the resulting file.</p>
+<p>The first snippet, <code class="docutils literal notranslate"><span class="pre">'pi=3.14159'</span></code> is a valid Python statement defining
+variable <code class="docutils literal notranslate"><span class="pre">pi</span></code>. This snippet produces no output, its content is just copied
+into the resulting file, but the variable <code class="docutils literal notranslate"><span class="pre">pi</span></code> can be used later on.</p>
+<p>The next snippet, <code class="docutils literal notranslate"><span class="pre">'pi*2'</span></code>, is a valid Python expression. It can be
+evaluated, and in the resulting file its code is substituted with the string
+representation of the result of evaluation.</p>
+<p>The next snippet, starting with statement <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">math</span> <span class="pre">import</span> <span class="pre">cos</span></code>, takes
+several lines and represents a valid Python script that can be executed. This
+snippet contains print statements that generates some standard output that,
+together with the snippet’s code, will appear in the resulting file.</p>
+<p>Note that the structure of the template is accurately repeated in the resulting
+file. Results of snippets evaluation appears exactly at places where the
+snippets were written in the template.  Variables defined in previous snippets
+can be used in the following snippets. String representation of snippet
+evaluation can be controlled with optional snippet keys. Multi-line snippets
+can be commented out in the resulting file. A snippet can be as simple as an
+in-line reference to a variable, or it can represent a complete Python script,
+thus, the whole power of Python ans its packages can be used to facilitate
+preparation of input files.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how_to_use.html">How to use TSP</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conclusion.html">Conclusion and acknowledgement</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">TSP package documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="how_to_use.html"
+                        title="next chapter">How to use TSP</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="how_to_use.html" title="How to use TSP"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="TSP package documentation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">tsp package 1.2.b documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, Anton Travleev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>

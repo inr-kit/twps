@@ -38,22 +38,23 @@ def main():
 
 Usage:
 
-> {} [-'snippet'] [--'var list_of_values'] template
+> {} template.t [-'snippet'] [--'name1 vals1' --'name2 vals2' ...]
 
-where `template' is a text file containing python snippets.  Snippets are
+where `template.t' is a text file containing python snippets.  Snippets are
 evaluated/executed and the snippet code is replaced with the result of
-evaluation/execution. The resulting file is saved to `template.res'.
+evaluation/execution. The resulting file is saved to `template.res.t'.
 
-Optional argument starting with single `-` is a snippet evaluated before
-processing the template. Thus, one can e.g. define in the command line a
-parameter used later in the template.
+When optional `snippet` is given, it is evaluated or executed before the
+snippets in `template.t`. If the snippet contains spaces, protect them with
+quotes, i.e. -'a = 5'.
 
-Optional argument(s) starting with two minus signs, `--`, define variables for
-parametric studies. The string following `--` (possibly protected with single
-or double quotes) defines the name of the variable and the list of values this
-variable takes. The template is processed for each variable's value; the
-resulting file is written to `template._i1_i2_..._iN`, where i1 is the index of
-the 1-st variable's value, i2 -- the index of the second variable's value etc.
+One can provide variable names and set of their values. The template will be
+processed  with all possible combinations. For example, if one argument
+starting with two dashes is given, i.e. --'v 1 2 3', three resulting files will
+be created, named `template._0.t', `template._1.t' etc. The `v' variable will
+be set qonsecutively to each of the given values. If more than one `--' options
+are given, they are interpreted as nested loop.
+
 """.format(path.basename(argv[0]))
 
     if len(argv) < 2 or '--help' in ''.join(argv[1:]).lower():

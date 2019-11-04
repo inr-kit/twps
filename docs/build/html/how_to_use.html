@@ -1,0 +1,1051 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>How to use TSP &#8212; tsp package 1.2.b documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">tsp package 1.2.b documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="how-to-use-tsp">
+<h1>How to use TSP<a class="headerlink" href="#how-to-use-tsp" title="Permalink to this headline">¶</a></h1>
+<p>Basic usage of the TSP package is to simplify preparation of input decks
+for computer codes with limited syntax possibilities. Instead of writing an
+input deck directly, a template can be written that generally has syntax
+and structure of the input deck, but also can include Python code snippets,
+which will be replaced in the resulting file. Thus one can e.g. define and
+use variables, include external files, even if these operations are not
+permitted by the input file syntax of the target computer code. Ultimately,
+one gets possibility to use the whole legacy of Python when writing an input
+deck.</p>
+<p>The TSP preprocessor, an executable script called <code class="docutils literal notranslate"><span class="pre">ppp.py</span></code>, is used to
+process templates. If a template file is stored in file <code class="docutils literal notranslate"><span class="pre">input.t</span></code>, the following
+command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ ppp.py input.t
+</pre></div>
+</div>
+<p>will generate the file called <code class="docutils literal notranslate"><span class="pre">input.res.t</span></code> that contains the result of
+processing.</p>
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2018.12: </span>Previously, the suffix <code class="docutils literal notranslate"><span class="pre">.res</span></code> was simply attached to the template’s file name. Now
+the extension is preserved, which helps to use e.g. syntax highlighting both in the
+template and resulting file.</p>
+</div>
+<p>The content of the template file is logically divided into two parts. The
+template’s first line is used to set the delimiters for the
+snippets and to specify some other options. The rest of the template file, i.e.
+everything from its second line till the end of file, defines the content
+of the resulting file (it is called below <strong>template body</strong>). It is
+arbitrary text, interlaced with Python snippets, the latter must be marked
+with delimiters defined at the first line. Details see in Section
+<a class="reference internal" href="#template-syntax"><span class="std std-ref">Structure of template file</span></a>.</p>
+<p>There are two types of snippets, <strong>evaluation snippets</strong> and
+<strong>executable snippets</strong>. Evaluation snippets are substituted by the
+result of evaluation.  Executable snippets are copied into the resulting
+file, but if any standard output is generated during their execution, it is
+appended to the snippet in the resulting file. For details see
+<a class="reference internal" href="#snippets-processing"><span class="std std-ref">Processing of snippets</span></a>.</p>
+<p>There are options that control the appearance of sippets in the
+resulting file, see <a class="reference internal" href="#keys-label"><span class="std std-ref">Optional snippet keys</span></a>. The multi-line snippets can be
+commented out in the resulting file, see <a class="reference internal" href="#multi-line-snippets"><span class="std std-ref">Multi-line snippets</span></a>.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>To install the TPS package, unzip ( untar) the downloaded archive, go
+to the created directory containing file <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> and run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python setup.py install
+</pre></div>
+</div>
+<p>This command will install files into the default location, which for a Linux-based OS
+is in <code class="docutils literal notranslate"><span class="pre">/usr/local</span></code> and requires administrator priviledges.  Alternatively,
+one can install the package locally, using the command line option <code class="docutils literal notranslate"><span class="pre">--user</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python setup.py install --user
+</pre></div>
+</div>
+<p>For details see <a class="footnote-reference" href="#id2" id="id1">[1]</a>.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="http://docs.python.org/install/index.html">http://docs.python.org/install/index.html</a>.</td></tr>
+</tbody>
+</table>
+<p>The TSP package provides the script called <code class="docutils literal notranslate"><span class="pre">ppp.py</span></code>. During the installation
+process, the script will be copied into the directory where the Python
+interpreter is installed (under Windows it can be something like
+<code class="docutils literal notranslate"><span class="pre">c:\Python27\Scripts</span></code>) and thus will be available at the command prompt. The
+installation is sucsessful, if the script is available at the command line, and
+when called without a command line parameter, generates the following message:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ ppp.py
+
+(P)ython (P)re(P)rocessor: script from the tsp Python package. Abbreviation
+&quot;tsp&quot; means (T)ext with (S)nippets (P)reprocessor.
+
+Usage:
+
+&gt; ppp.py template.t [-&#39;snippet&#39;] [--&#39;name1 vals1&#39; --&#39;name2 vals2&#39; ...]
+
+where `template.t&#39; is a text file containing python snippets.  Snippets are
+evaluated/executed and the snippet code is replaced with the result of
+evaluation/execution. The resulting file is saved to `template.res.t&#39;.
+
+When optional `snippet` is given, it is evaluated or executed before the
+snippets in `template.t`. If the snippet contains spaces, protect them with
+quotes, i.e. -&#39;a = 5&#39;.
+
+One can provide variable names and set of their values. The template will be
+processed  with all possible combinations. For example, if one argument
+starting with two sashes is given, i.e. --&#39;v 1 2 3&#39;, three resulting files will
+be created, named `template._0.t&#39;, `template._1.t&#39; etc. The `v&#39; variable will
+be set qonsecutively to each of the given values. If more than one `--&#39; options
+are given, they are interpreted as nested loop.
+
+
+</pre></div>
+</div>
+<p>Script <code class="docutils literal notranslate"><span class="pre">ppp.py</span></code> uses function <code class="xref py py-func docutils literal notranslate"><span class="pre">pre_pro()</span></code>, defined in the module
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">text_with_snippets</span></code> of the TSP package. Although the most common use of
+TSP is to call <code class="docutils literal notranslate"><span class="pre">ppp.py</span></code> script from the terminal command line, one can also import
+this function and use it from the Python interpreter or in a Pyhon script.</p>
+<p>The name of the text file to be processed must be given to <code class="docutils literal notranslate"><span class="pre">ppp.py</span></code> as a command
+line argument. The output file will have the name of the input file, with
+suffix <code class="docutils literal notranslate"><span class="pre">.res</span></code> attached to the filename without extension (thus the template
+and resulting file have the same extension). So far the TSP package is
+installed, the <code class="docutils literal notranslate"><span class="pre">ppp.py</span></code> script should be availabe at the command line, and the
+command</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ppp.py input.inp
+</pre></div>
+</div>
+<p>should result in a new file called <code class="docutils literal notranslate"><span class="pre">input.res.inp</span></code>.</p>
+</div>
+<div class="section" id="structure-of-template-file">
+<span id="template-syntax"></span><h2>Structure of template file<a class="headerlink" href="#structure-of-template-file" title="Permalink to this headline">¶</a></h2>
+<p>Generally, the content of a template file consists of the first line with
+information for the preprocessor, followed by arbitrary text interlaced with
+Python snippets.</p>
+<p>Python snippets must be marked at the beginnig and at the end by the characters
+specified at the first line.  Optionally, each snippet can be prefixed with a
+key that specifies details of how the snippet code and its
+evaluation/execution result appears in the resulting file. For available keys see <a class="reference internal" href="#keys-label"><span class="std std-ref">Optional snippet keys</span></a>.</p>
+<p>Inside snippets, the snippet delimiting characters cannot be used, in all other
+respects a snippet must represent valid Python code.</p>
+<div class="section" id="the-first-line">
+<span id="first-line"></span><h3>The first line<a class="headerlink" href="#the-first-line" title="Permalink to this headline">¶</a></h3>
+<p>The template’s first line must contain information about snippet delimiters.
+Optionally, it can also contain the commenting string, which will be used to comment
+out the multi-line snippets in the resulting file, and the default key, which will
+be applied to all snippets.</p>
+<p>The snippet delimiting characters are the last two characters of the first line
+with trailing spaces stripped off. They must be specified, i.e. the first line
+must have at least two characters. An example of an minimalistic first line is shown on the
+following template</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;&#39;
+Simple text and snippets: &#39;i=1&#39;, &#39;i&#39;.
+</pre></div>
+</div>
+<p>In this template, the apostrophe, <code class="docutils literal notranslate"><span class="pre">'</span></code>, is used to mark both the beginning and
+the end of the snippets. Any characters can be used as delimiters, although in the case of
+alphanumeric delimiters, a warning message will be issued. In the following template, character <code class="docutils literal notranslate"><span class="pre">y</span></code> is
+used to mark the snippet’s begin, and characher <code class="docutils literal notranslate"><span class="pre">z</span></code> – to mark the snippet’s end:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>yz
+Alpha-numeric characters can
+be used as snippet&#39;s delimiters
+as well, but a warning message
+will be issued.
+
+ya=1z, ya*2z.
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>Alpha-numeric characters can
+be used as snippet&#39;s delimiters
+as well, but a warning message
+will be issued.
+
+ya=1z, 2.
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This template is processed with the following warning message:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Message 0 from alphanum.t Start processing
+Message 1 from alphanum.t
+    line 1 WARNING:
+    the delimiter specified on the first line of
+    the template, is alpha-numeric or blank.
+
+    COMMENTING STRING: 
+    STARTING DELIMITER: y
+    ENDING DELIMITER: z
+Message 1 from alphanum.t
+    line 1 WARNING:
+    string of commenting characters is empty.
+    Multi-line  snippets remain uncommented.
+Message 0 from alphanum.t Result is written to alphanum.res.t
+</pre></div>
+</div>
+<p>After the delimiters are read from the first line, it is
+searched for a substring representing a valid key (possible keys see in
+<a class="reference internal" href="#keys-label"><span class="std std-ref">Optional snippet keys</span></a>). If such substring is found, it will be used as the default
+snippet key. The following example shows the first line specifying <code class="docutils literal notranslate"><span class="pre">-l</span></code> key as the default one:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>-l&#39;&#39;
+All snippets in this template will have the -l option,
+if no other key is specified.
+</pre></div>
+</div>
+<p>Only the first substring matching one of the available keys will be taken into account.</p>
+<p>Additionally, in the  first line one can define a string of commenting
+characters. It is used to comment out multi-line snippets in the resulting
+file. The commenting string is the rest of the first line after stripping the
+trailing spaces, reading (and removing) the delimiting characters and reading
+(and removing) the default key.  The commenting string can be empty, as in the
+examples above, in this case the multi-line snippets will appear in the
+resulting file as is, without commenting out. In this case a warning is issued.</p>
+<div class="section" id="example-1">
+<h4>Example 1<a class="headerlink" href="#example-1" title="Permalink to this headline">¶</a></h4>
+<p>In the following example, the commenting string consists of character <code class="docutils literal notranslate"><span class="pre">c</span></code>
+followed by one space, the delimiters are quotes <code class="docutils literal notranslate"><span class="pre">'</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+c -d&#39;dr=1&#39;
+c dr is &#39;  dr  &#39; cm.
+c &#39;
+  print
+  for i in range(5):
+    print &quot;%2i cz %6f&quot; % (i, i*dr)&#39;
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c 
+c dr is 1 cm.
+c &#39;
+c   print
+c   for i in range(5):
+c     print &quot;%2i cz %6f&quot; % (i, i*dr)&#39;
+ 0 cz 0.000000
+ 1 cz 1.000000
+ 2 cz 2.000000
+ 3 cz 3.000000
+ 4 cz 4.000000
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This template describes a part of an MCNP input file, where <code class="docutils literal notranslate"><span class="pre">C</span></code> or
+<code class="docutils literal notranslate"><span class="pre">c</span></code> character at the first five positions of a line followed by a space means that
+this line is a comment.</p>
+</div>
+<div class="section" id="example-2">
+<h4>Example 2<a class="headerlink" href="#example-2" title="Permalink to this headline">¶</a></h4>
+<p>This example differs from the previous one by the first line only, where the default snippet
+key is set to <code class="docutils literal notranslate"><span class="pre">-l</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c -l&#39;&#39;
+c -d&#39;dr=1&#39;
+c dr is &#39;  dr  &#39; cm.
+c &#39;
+  print
+  for i in range(5):
+    print &quot;%2i cz %6f&quot; % (i, i*dr)&#39;
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c 
+c dr is 1 cm.
+c &#39;
+c -l  print
+c -l  for i in range(5):
+c -l    print &quot;%2i cz %6f&quot; % (i, i*dr)&#39;
+ 0 cz 0.000000
+ 1 cz 1.000000
+ 2 cz 2.000000
+ 3 cz 3.000000
+ 4 cz 4.000000
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The commenting string is <code class="docutils literal notranslate"><span class="pre">'c</span> <span class="pre">'</span></code>, the default key is <code class="docutils literal notranslate"><span class="pre">-l</span></code> and both
+delimiters are <code class="docutils literal notranslate"><span class="pre">'</span></code>.  This example is similar to the previous one, except the
+default positioning of the snippet evaluation results is changed. By default,
+the space allocated by a snippet is not preserved (the <code class="docutils literal notranslate"><span class="pre">-D</span></code> option), here we
+specified another default behaviour: if the snippet evaluation result is
+shorter than the snippet itself, the result will be adjusted left (the <code class="docutils literal notranslate"><span class="pre">-l</span></code>
+option). With this option, the resulting file can be more similar to the
+template file, as compared with the resulting file obtained with default <code class="docutils literal notranslate"><span class="pre">-D</span></code>
+option.</p>
+<p>Note that the key specified in the first line defines the default key; each snippet still can be
+preceded with its own key that overwrites the default one.</p>
+</div>
+<div class="section" id="example-3">
+<h4>Example 3<a class="headerlink" href="#example-3" title="Permalink to this headline">¶</a></h4>
+<p>The commenting string is <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">-r</span></code>, the default key is <code class="docutils literal notranslate"><span class="pre">-l</span></code>, the beginning
+delimter is the back quote, <code class="docutils literal notranslate"><span class="pre">`</span></code>, and the end delimiter is the single quote,
+<code class="docutils literal notranslate"><span class="pre">'</span></code>:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>-l# -r`&#39;
+`
+  # multi-line snippet
+  a = 1
+  print
+  print a
+&#39;
+Check default key: `  a  &#39;.
+
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>`
+# -r  # multi-line snippet
+# -r  a = 1
+# -r  print
+# -r  print a
+# -r&#39;
+1
+
+Check default key: 1      .
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This example illustrates that the default key and the commenting string can be
+specified in arbitrary order. Note that only the first substring that matches the key pattern is
+taken into account. The rest of the line (after removing the delimiters and the default key)
+is considered as the commenting string.</p>
+</div>
+</div>
+<div class="section" id="template-s-body">
+<span id="snippets"></span><h3>Template’s body<a class="headerlink" href="#template-s-body" title="Permalink to this headline">¶</a></h3>
+<p>Everything after the template’s first line constitutes the template’s body
+that contains arbitrary text and Python snippets.</p>
+<p>Inside the template body, snippets must be delimited at the beginning and at
+the end by characters specified in the first line. The beginning delimiter can
+be preceded with any other character, and the end delimiter can be followed by
+any other character. In the following example, text within quotes will be
+recognized by the preprocessor as a snippet:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;&#39;
+&#39;a=&quot;R&quot;&#39; Template can start with
+a snippet. Snippet can appear
+inside a wo&#39;a&#39;d.
+
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;a=&quot;R&quot;&#39; Template can start with
+a snippet. Snippet can appear
+inside a woRd.
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>A snippet prefix consisting of the minus sign followed by a letter can have
+special meaning. If it coincides with one of the snippet keys (see in
+<a class="reference internal" href="#keys-label"><span class="std std-ref">Optional snippet keys</span></a>) , the snippet representation in the resulting file will be
+changed and the prefix will not appear in the resulting file. Examples of
+snippet prefixes:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;&#39;
+Snippet without any prefix: &#39;a=1&#39;
+Snippet with key -l:  -l&#39;a&#39;.
+
+The following prefix does not 
+correspond to any snippet key, 
+it will be considered as usual 
+text: -M&#39;a*2&#39;.
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>Snippet without any prefix: &#39;a=1&#39;
+Snippet with key -l:    1  .
+
+The following prefix does not 
+correspond to any snippet key, 
+it will be considered as usual 
+text: -M2.
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The snippet delimiter characters cannot be used inside snippets, since they
+would be considered by the preprocessor as the beginning or end of the snippet.
+Usually, this limitation can be simply overcome by choosing proper delimiting
+characters. <a class="footnote-reference" href="#id4" id="id3">[2]</a></p>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td>Note that in Python one can use interchangeably single and double quotes for strings.</td></tr>
+</tbody>
+</table>
+<p>All snippets are evaluated or executed in the common namespace. This means that
+a variable defined in one snippet will be “seen” in the following snippets.
+Similarly, modules loaded in a snippet will become available in all consequent
+snippets. This is also valid for inclusion of external templates: when a snippet
+calls the <code class="xref py py-func docutils literal notranslate"><span class="pre">pre_pro()</span></code> function to process another template, all
+variables defined in the processed template will become available in the
+“calling” template.</p>
+</div>
+</div>
+<div class="section" id="processing-of-snippets">
+<span id="snippets-processing"></span><h2>Processing of snippets<a class="headerlink" href="#processing-of-snippets" title="Permalink to this headline">¶</a></h2>
+<p>A snippet can be evaluated or executed. When a snippet is found, the
+preprocessor first tries to evaluate it using the <code class="docutils literal notranslate"><span class="pre">eval</span></code> <a class="footnote-reference" href="#id9" id="id5">[3]</a> Python built-in
+function, and if the evaluation causes the <code class="docutils literal notranslate"><span class="pre">SyntaxError</span></code>, the snippet will
+be executed using the <code class="docutils literal notranslate"><span class="pre">exec</span></code> <a class="footnote-reference" href="#id10" id="id6">[4]</a> Python built-in function. Thus, if a snippet code
+is an expression <a class="footnote-reference" href="#id11" id="id7">[5]</a> (for example, <code class="docutils literal notranslate"><span class="pre">b</span></code>, <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> are expressions) it will be
+evaluated, and if a snippet is a statement <a class="footnote-reference" href="#id12" id="id8">[6]</a> (or several statements taking
+several lines), it will be executed.</p>
+<table class="docutils footnote" frame="void" id="id9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[3]</a></td><td><a class="reference external" href="http://docs.python.org/library/functions.html#eval">http://docs.python.org/library/functions.html#eval</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[4]</a></td><td><a class="reference external" href="http://docs.python.org/reference/simple_stmts.html#exec">http://docs.python.org/reference/simple_stmts.html#exec</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id11" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[5]</a></td><td><a class="reference external" href="http://docs.python.org/reference/expressions.html">http://docs.python.org/reference/expressions.html</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id12" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[6]</a></td><td><a class="reference external" href="http://docs.python.org/reference/simple_stmts.html">http://docs.python.org/reference/simple_stmts.html</a></td></tr>
+</tbody>
+</table>
+<p>When a snippet is evaluated, the string representation of the evaluation result
+will substitute the snippet code in the resulting file. When a snippet is
+executed, its code is repeated in the resulting file and standard output
+generated by the snippet will be caught and put right after the snippet code.
+This default behaviour can be modified to some extent by the snippet keys,
+described in the section <a class="reference internal" href="#keys-label"><span class="std std-ref">Optional snippet keys</span></a>.</p>
+<div class="section" id="evaluation-examples">
+<h3>Evaluation examples<a class="headerlink" href="#evaluation-examples" title="Permalink to this headline">¶</a></h3>
+<p>When a snippet is evaluated and the evaluation result substitutes the snippet
+code in the resulting file, several situations are possible.  If the resulting
+string is longer or shorter than the snippet code, the text on the line
+after the snippet will be shifted in the resulting file:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+Let c be a long string: &#39;c=&quot;abcde&quot;&#39;. 
+Evaluating c, &#39;c&#39;, will shift the 
+rest of the line.
+
+Let define a variable with a very 
+lond name, &quot;LongVariable&quot;, and 
+set it to very short string value: 
+&#39;LongVariable=&quot;a&quot;&#39;.
+Evaluating it, &#39;LongVariable&#39;, will 
+also shift the rest of the line.
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>Let c be a long string: &#39;c=&quot;abcde&quot;&#39;. 
+Evaluating c, abcde, will shift the 
+rest of the line.
+
+Let define a variable with a very 
+lond name, &quot;LongVariable&quot;, and 
+set it to very short string value: 
+&#39;LongVariable=&quot;a&quot;&#39;.
+Evaluating it, a, will 
+also shift the rest of the line.
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note, in the template’s 3-rd line, the snippet code <code class="docutils literal notranslate"><span class="pre">'c'</span></code> takes 3 characters
+(the delimiters are counted as well) and it is substituted with a string of 6 characters
+<code class="docutils literal notranslate"><span class="pre">abcdef</span></code> in the result. In the 9-th line the snippet <code class="docutils literal notranslate"><span class="pre">'LongVariable'</span></code>
+that takes 14 characters in the template, is replaced with only one character <code class="docutils literal notranslate"><span class="pre">'a'</span></code>.</p>
+<p>If the evaluation result is shorter than the snippet code, the default behaviour
+can be changed using <a class="reference internal" href="#keys-label"><span class="std std-ref">Optional snippet keys</span></a>.
+If the resulting string and the snippet code have the same length, the text
+after the snippet will remain its position.</p>
+</div>
+<div class="section" id="execution-examples">
+<h3>Execution examples<a class="headerlink" href="#execution-examples" title="Permalink to this headline">¶</a></h3>
+<p>In the following example, the first snippet, <code class="docutils literal notranslate"><span class="pre">'a=&quot;abc&quot;'</span></code> is executed. The
+second snippet that is just the variable reference, <code class="docutils literal notranslate"><span class="pre">'a'</span></code> is evaluated, and
+the third snippet that contains the <code class="docutils literal notranslate"><span class="pre">print</span></code> statement, is again executed:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c&#39;&#39;
+First, define variable: &#39;a=&quot;abc&quot;&#39;. 
+This snippet will be executed.
+
+In the follooiwng snippet, a is 
+just evaluated: &#39;a&#39;, and the 
+evaluation result substitutes 
+the snippet code.
+
+The standard output from snippet 
+execution will be put right after 
+the snippet: &#39;print a&#39;, like here.
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>First, define variable: &#39;a=&quot;abc&quot;&#39;. 
+This snippet will be executed.
+
+In the follooiwng snippet, a is 
+just evaluated: abc, and the 
+evaluation result substitutes 
+the snippet code.
+
+The standard output from snippet 
+execution will be put right after 
+the snippet: &#39;print a&#39;abc
+, like here.
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note that by default, the print <a class="footnote-reference" href="#id14" id="id13">[7]</a> Python statement adds the new-line character
+at the end of the printed line, therefore in the above example the rest of the
+line after the last snippet jumped onto the next line. To avoid the new-line
+character, the comma-ended variant of the print statement should be used, e.g.
+<code class="docutils literal notranslate"><span class="pre">'print</span> <span class="pre">a,'</span></code>.</p>
+<table class="docutils footnote" frame="void" id="id14" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id13">[7]</a></td><td><a class="reference external" href="http://docs.python.org/reference/simple_stmts.html#print">http://docs.python.org/reference/simple_stmts.html#print</a></td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="multi-line-snippets">
+<span id="id15"></span><h3>Multi-line snippets<a class="headerlink" href="#multi-line-snippets" title="Permalink to this headline">¶</a></h3>
+<p>A snippet can take several lines, in this case it is always executed. The usual
+indentation rules for Python code should apply to the multi-line snippets.
+Consider the following template:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+This is a multi-line snippet: &#39;
+    a = 1
+    b = 2
+    print a, b&#39;
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>This is a multi-line snippet: &#39;
+c     a = 1
+c     b = 2
+c     print a, b&#39;1 2
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The multi-line snippet here has 4 lines. The first line of the snippet is
+empty: it starts right after the opening apostrophe and goes till the end of
+the line. The 2-nd, 3-rd and 4-th lines contain Python statements that are
+indented, i.e. start at 5-th position. The indentation of the first
+statement is optional and used in this example to visually distinguish the
+snippet from the surrounding text. This indentation will be removed by the
+preprocessor before passing the snippet to execution. Indentation of the
+following statements should follow the Python rules.</p>
+<p>The code can start on the first snippet line as well, but in this case one
+should take care about the proper indentation. The following example would
+cause the indentation error, since the first code line has no indentation and
+the other lines are indented (the snippet execution will be aborted so that no
+standard output will be generated):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+A multi-line snippet: &#39;a = 1
+    b = 2
+    print a, b&#39;
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>A multi-line snippet: &#39;a = 1
+c     b = 2
+c     print a, b&#39;
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This template would produce the following output:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Message 0 from mline2.t Start processing
+Message 1 from mline2.t
+    line 2
+    snippet &#39;a = 1\n    b = 2\n    print a, b&#39; WARNING: Snippet caused execution error:
+Message 0 from mline2.t Result is written to mline2.res.t
+</pre></div>
+</div>
+<p>The right way to put the code into the first snippet line is:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+A multi-line snippet: &#39;    a = 1
+    b = 2
+    print a, b&#39;
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>A multi-line snippet: &#39;    a = 1
+c     b = 2
+c     print a, b&#39;1 2
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Note that this form is visualy less clear than in the first example in this
+section, so it is better to avoid putting any code to the first line of the
+multi-line snippet.</p>
+<p>Multi-line snippets are always executed. By default, the code of the multi-line
+snippets is repeated in the resulting file (for the other behaviour use <code class="docutils literal notranslate"><span class="pre">-d</span></code> key,
+see <a class="reference internal" href="#keys-label"><span class="std std-ref">Optional snippet keys</span></a>), and if any standard output is generated by the snippet,
+it is placed right after the snippet’s end delimiter, on the same line.</p>
+<p>When a multi-line snippet is repeated in the resulting file, all lines of the
+snippet code, except the first one, are commented out by appending the string of
+commenting characters to every snippet line. The commenting string is
+defined in the template first line, see <a class="reference internal" href="#first-line"><span class="std std-ref">The first line</span></a>. In the following template, the
+two-characters string <code class="docutils literal notranslate"><span class="pre">'c</span> <span class="pre">'</span></code> (character <code class="docutils literal notranslate"><span class="pre">c</span></code> followed by the space) will be
+used to comment mulitline snippets:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+a multiline snippet:&#39;
+    # this is usual python script
+    a = 1
+    b = 2
+    c = &quot;abc&quot;&#39;
+
+The variables defined in the 
+snippet above: &#39;a&#39;, &#39;b&#39;, &#39;c&#39;.
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>a multiline snippet:&#39;
+c     # this is usual python script
+c     a = 1
+c     b = 2
+c     c = &quot;abc&quot;&#39;
+
+The variables defined in the 
+snippet above: 1, 2, abc.
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The string of commenting  characters defined in the templates’s first line can
+be empty. In this case a warning message will be printed and multi-line
+snippets will not be commented out in the resulting file.</p>
+<p>The standard output of the multi-line snippet is added right after the snippet
+code, on the same line. In this case the first line of the output can become
+commented out, like in the following example:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+A multi-line snippet to generate a 
+list of increasing numbers:&#39;
+    for i in range(3):
+        print i
+&#39;
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>A multi-line snippet to generate a 
+list of increasing numbers:&#39;
+c     for i in range(3):
+c         print i
+c &#39;0
+1
+2
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Sometimes, it is desired to put the snippet output on extra lines. To do this,
+use additional <code class="docutils literal notranslate"><span class="pre">print</span></code> statements in the snippet code. The above example would be:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c &#39;&#39;
+A multi-line snippet to generate a 
+list of increasing numbers:&#39;
+    print 
+    for i in range(3):
+        print i
+&#39;
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>A multi-line snippet to generate a 
+list of increasing numbers:&#39;
+c     print 
+c     for i in range(3):
+c         print i
+c &#39;
+0
+1
+2
+
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="optional-snippet-keys">
+<span id="keys-label"></span><h3>Optional snippet keys<a class="headerlink" href="#optional-snippet-keys" title="Permalink to this headline">¶</a></h3>
+<p>Optionally, a snippet can be prefixed with a key. A key consists of the
+minus sign followed by a character, and must precede the snippet starting
+delimiter without any blanks. The default key can be specified at the template first
+line. It will apply to all snippets without keys.</p>
+<p>Currently, the following keys are defined:</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Meaning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">-D</span></code></td>
+<td>default. Do not preserve place</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">-r</span></code></td>
+<td>adjust evaluation result right</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">-l</span></code></td>
+<td>adjust evaluation result left</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">-c</span></code></td>
+<td>center evaluation result</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">-d</span></code></td>
+<td>delete snippet code</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">-s</span></code></td>
+<td>skip snippet evaluation</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Keys <code class="docutils literal notranslate"><span class="pre">-D</span></code>, <code class="docutils literal notranslate"><span class="pre">-r</span></code>, <code class="docutils literal notranslate"><span class="pre">-l</span></code>, and <code class="docutils literal notranslate"><span class="pre">-c</span></code> specify how the result of snippet
+evaluation should be aligned within the place allocated by the snippet code (if
+no key is given before the snippet and no default key is specified at the first
+template line, the <code class="docutils literal notranslate"><span class="pre">-D</span></code> key will apply, i.e.  the snippet’s place will not be preserved).
+These keys have meaning only if a snippet is evaluated, i.e. when the evaluation
+result should fit into the place allocated by the snippets code.</p>
+<p>Key <code class="docutils literal notranslate"><span class="pre">-d</span></code> will delete the snippet code, so that the code will not enter the
+resulting file.  In the case of snippet evaluation, the snippet will be
+evaluated, but nothing will go to the resulting file. If the snippet is
+executed, the resulting file will contain only the standard output of the
+execution, not the snippet code itself.</p>
+<p>Key <code class="docutils literal notranslate"><span class="pre">-s</span></code> specifies that the snippet should not be evaluated nor executed. In
+this case, the snippet code is simply copied into the resulting file.</p>
+<p>Snippet keys, except <code class="docutils literal notranslate"><span class="pre">-s</span></code>, do not appear in the resulting file.</p>
+<p>The meaning of the keys should be clear form the following example:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Template</th>
+<th class="head">Resulting file</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>c -D&#39;&#39;
+The defalut key can be specified 
+in the first line. If no key is 
+given, the default is -D.
+
+Example of snippet keys:
+
+|-r&#39;  1+1&#39;| adjust right
+|-l&#39;  1+1&#39;| adjust left
+|-c&#39;  1+1&#39;| adjust center
+|-D&#39;  1+1&#39;| do not preserve place
+|  &#39;  1+1&#39;| no key: use default
+|-d&#39;  1+1&#39;| delete snippet
+|-s&#39;  1+1&#39;| skip evaluation.
+</pre></div>
+</div>
+</td>
+<td><div class="first last highlight-none notranslate"><div class="highlight"><pre><span></span>The defalut key can be specified 
+in the first line. If no key is 
+given, the default is -D.
+
+Example of snippet keys:
+
+|        2| adjust right
+|  2      | adjust left
+|     2   | adjust center
+|  2| do not preserve place
+|  2| no key: use default
+|| delete snippet
+|-s&#39;  1+1&#39;| skip evaluation.
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to use TSP</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-of-template-file">Structure of template file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#processing-of-snippets">Processing of snippets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conclusion.html">Conclusion and acknowledgement</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="next chapter">Examples</a></p>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="examples.html" title="Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">tsp package 1.2.b documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2012, Anton Travleev.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>
