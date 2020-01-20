@@ -1,6 +1,6 @@
-tsp.egg-info
+twps.egg-info/*
 
-*.pyc
+twps/*.pyc
 
 docs/build/*
 
