@@ -5,7 +5,7 @@ make clean;
 make latex;
 
 # use vim to change latex file.
-texfile="build/latex/tsp.tex"
+texfile="build/latex/twps.tex"
 
 if [[ -f $texfile ]]; then
 
@@ -21,12 +21,12 @@ EOF
 
 cd build/latex/;
 make ;
-bibtex tsp;
-pdflatex tsp;
-pdflatex tsp;
-pdflatex tsp;
+bibtex twps;
+pdflatex twps;
+pdflatex twps;
+pdflatex twps;
 
-evince tsp.pdf &
+evince twps.pdf &
 wait
 
 fi

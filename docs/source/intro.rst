@@ -57,7 +57,7 @@ code pieces substituted with the result of their evaluation.
 
 .. _Python: http://www.python.org
 
-.. _TSP: https://github.com/inr-kit/tsp
+.. _TSP: https://github.com/inr-kit/twps
 
 This report explains the installation procedure of the TSP package, describes
 the syntax of the template file and gives some examples of the usage.

@@ -28,13 +28,13 @@ Script provides command line interface to the TSP python package.
 
 from sys import argv
 from os import path
-from tsp import pre_pro, params
+from twps import pre_pro, params
 
 
 def main():
     msg = """
-(P)ython (P)re(P)rocessor: script from the tsp Python package. Abbreviation
-"tsp" means (T)ext with (S)nippets (P)reprocessor.
+(P)ython (P)re(P)rocessor: script from the twps Python package. Abbreviation
+"twps" means (T)ext with (S)nippets (P)reprocessor.
 
 Usage:
 

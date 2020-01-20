@@ -4,12 +4,12 @@
 
 
 import sys, os
-import tsp
+import twps
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../../tsp'))
+sys.path.insert(0, os.path.abspath('../../twps'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -39,8 +39,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-name = u'tsp'
-project = u'tsp package'
+name = u'twps'
+project = u'twps package'
 copyright = u'2012, Anton Travleev'
 
 
@@ -49,7 +49,7 @@ copyright = u'2012, Anton Travleev'
 # built documents.
 #
 # The short X.Y version.
-version = tsp.__version__  # '1.2'
+version = twps.__version__  # '1.2'
 # The full version, including alpha/beta/rc tags.
 release = version  # '1.2.b' # beta, while no response from users
 
@@ -212,7 +212,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'tsp.tex', u'TSP package Documentation',
+  ('index', 'twps.tex', u'TSP package Documentation',
    u'Anton Travleev', 'manual'),
 ]
 
@@ -239,7 +239,7 @@ latex_domain_indices = True
 use_latex_toc = True
 
 latex_additional_files = ['_static/hpmc.bib',
-                          '_static/tsp.bib',
+                          '_static/twps.bib',
                           '_static/ans.bst']
 
 
@@ -248,7 +248,7 @@ latex_additional_files = ['_static/hpmc.bib',
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'tsp', u'tsp package Documentation',
+    ('index', 'twps', u'twps package Documentation',
      [u'Anton Travleev'], 1)
 ]
 
@@ -262,8 +262,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'tsp', u'tsp package Documentation',
-   u'Anton Travleev', 'tsp', 'One line description of project.',
+  ('index', 'twps', u'twps package Documentation',
+   u'Anton Travleev', 'twps', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -280,7 +280,7 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'tsp package'
+epub_title = u'twps package'
 epub_author = u'Anton Travleev'
 epub_publisher = u'Anton Travleev'
 epub_copyright = u'2012, Anton Travleev'
@@ -326,7 +326,7 @@ epub_copyright = u'2012, Anton Travleev'
 
 
 
-pdf_documents = [('index', 'tsp', general_title, r'A. Travleev'),]
+pdf_documents = [('index', 'twps', general_title, r'A. Travleev'),]
 
 # index - master document
 # sample - name of the generated pdf

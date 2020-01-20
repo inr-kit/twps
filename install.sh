@@ -1,4 +1,4 @@
-pip uninstall tsp;
+pip uninstall twps;
 
 pip install -e . --user
 

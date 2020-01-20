@@ -1,0 +1,10 @@
+README.rst
+setup.py
+twps/__init__.py
+twps/ppp.py
+twps/text_with_snippets.py
+twps/utils.py
+twps.egg-info/PKG-INFO
+twps.egg-info/SOURCES.txt
+twps.egg-info/dependency_links.txt
+twps.egg-info/top_level.txt

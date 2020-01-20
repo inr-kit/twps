@@ -1,7 +1,7 @@
 from distutils.core import setup
-import tsp
+import twps
 
-setup(name='tsp',
+setup(name='twps',
       # version: X.Y.Z, where:
       #    X -- major version. Different major versions are not back-compatible.
       #         New major version number, when code is rewritten
@@ -9,10 +9,10 @@ setup(name='tsp',
       #    Y -- minor version. New minor version, when new function(s) added.
       #
       #    Z -- update, new update number when a bug is fixed.
-      version=tsp.__version__,  # '1.3.2',
+      version=twps.__version__,  # '1.3.2',
       description='Text-with-Snippets Preprocessor',
       author='A.Travleev',
       author_email='anton.travleev@kit.edu',
-      packages=['tsp', ],
-      scripts = ['tsp/ppp.py']
+      packages=['twps', ],
+      scripts = ['twps/ppp.py']
       )

@@ -1,8 +1,0 @@
-README.rst
-tsp/__init__.py
-tsp/ppp.py
-tsp/text_with_snippets.py
-tsp.egg-info/PKG-INFO
-tsp.egg-info/SOURCES.txt
-tsp.egg-info/dependency_links.txt
-tsp.egg-info/top_level.txt

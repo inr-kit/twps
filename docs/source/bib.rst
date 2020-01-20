@@ -2,7 +2,7 @@
 
 .. raw:: latex
 
-    \bibliography{hpmc,tsp}
+    \bibliography{hpmc,twps}
     \bibliographystyle{ans}
 
 

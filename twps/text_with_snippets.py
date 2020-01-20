@@ -59,7 +59,7 @@ import os
 import traceback
 from os import path, chmod, getcwd, utime
 from stat import S_IREAD, S_IWRITE
-from tsp.utils import variants
+from twps.utils import variants
 
 # Log level:
 #       0 -- errors
