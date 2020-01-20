@@ -1,4 +1,4 @@
-TSP package documentation
+TWPS package documentation
 #############################
 
 

@@ -3,14 +3,14 @@
 Examples
 ==========
 
-This section shows how the TSP package can be applied to tasks that often arise during preparation of 
+This section shows how the TWPS package can be applied to tasks that often arise during preparation of 
 complex input files. This covers inclusion of external files and templates and generation of a set of input 
 files that differ by some parameter (for e.g. parametric studies).
 
 
 Inclusion of external files
 ----------------------------
-The TSP package provides no special mechanism to include external files into the resulting
+The TWPS package provides no special mechanism to include external files into the resulting
 file, however, one can use standard Python capabilities. In the following
 example, an external file is read by the ``open`` [#]_ Python function and its
 content is printed to the standard output. Since the standard output of the
@@ -47,7 +47,7 @@ Inclusion of other templates
 While in the above example inclusion of text file without any preprocessing is
 shown, often it is necessary to include another template that needs first to be
 preprocessed. To accomplish this task one needs to use directly the function
-:func:`pre_pro` from the module :mod:`text_with_snippets` of the TSP package.
+:func:`pre_pro` from the module :mod:`text_with_snippets` of the TWPS package.
 In simple situations this function is called by the preprocessor ``ppp.py`` so
 that a user does not use it directly; this example shows how to use this
 function directly in a template (or in a Python script).

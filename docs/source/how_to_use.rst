@@ -1,9 +1,9 @@
 .. |ppp| replace:: ``ppp.py``
 
-How to use TSP
+How to use TWPS
 #################
 
-The basic TSP use is to simplify preparation of input decks
+The basic TWPS use is to simplify preparation of input decks
 for computer codes with limited syntax possibilities. Instead of writing the
 input deck directly, a template can be written that generally has syntax
 and structure of the input deck, but also can include Python code snippets,
@@ -13,7 +13,7 @@ permitted by the input file syntax of the target computer code. Ultimately,
 one gets possibility to use the whole legacy of Python when writing an input
 deck.
 
-The TSP package provides the command line preprocessor, an executable script
+The TWPS package provides the command line preprocessor, an executable script
 called ``ppp.py``.  For the template ``input.t``, the
 following command::
 
@@ -76,7 +76,7 @@ For details see [#]_.
 
 .. [#] http://docs.python.org/install/index.html.   
 
-The TSP package provides script ``ppp.py``. During the installation
+The TWPS package provides script ``ppp.py``. During the installation
 process, the script will be copied into the directory where the Python
 interpreter is installed (under Windows it can be something like
 ``c:\Python27\Scripts``) and thus will be available at the command prompt. The
@@ -86,14 +86,14 @@ when called without a command line parameter, generates the following message:
 .. literalinclude:: examples/message.txt    
 
 Script |ppp| uses function :func:`pre_pro`, defined in the module
-:mod:`text_with_snippets` of the TSP package. Although the most common use of
-TSP is to call |ppp| script from the terminal command line, one can also import
+:mod:`text_with_snippets` of the TWPS package. Although the most common use of
+TWPS is to call |ppp| script from the terminal command line, one can also import
 this function and use it from the Python interpreter or in a Pyhon script.
 
 The name of the text file to be processed must be given to |ppp| as a command
 line argument. The output file will have the name of the input file, with
 suffix ``.res`` attached to the filename without extension (thus the template
-and resulting file have the same extension). So far the TSP package is
+and resulting file have the same extension). So far the TWPS package is
 installed, the |ppp| script should be availabe at the command line, and the
 command
 

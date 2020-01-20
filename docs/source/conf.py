@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath('../../twps'))
 
 # -- General configuration -----------------------------------------------------
 
-general_title = 'TSP Python package: Preprocessor for Text files with Python Snippets'
+general_title = 'TWPS Python package: (T)ext (W)ith (P)ython (S)nippets -- a preprocessor for Text files with Python Snippets'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.0'
@@ -212,7 +212,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'twps.tex', u'TSP package Documentation',
+  ('index', 'twps.tex', u'TWPS package Documentation',
    u'Anton Travleev', 'manual'),
 ]
 

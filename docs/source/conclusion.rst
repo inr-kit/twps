@@ -4,7 +4,7 @@
 Conclusion and acknowledgement
 ==================================
 
-Basic usage of the TSP package is to simplify preparation of input decks
+Basic usage of the TWPS package is to simplify preparation of input decks
 for computer codes with limited syntax possibilities. Instead of writing an
 input deck directly, a template can be written, which generally has syntax
 and structure of the input deck, but also can include Python code snippets,
@@ -14,7 +14,7 @@ permitted by the input file syntax of the target computer code. Ultimately,
 one gets possibility to use the whole legacy of Python when writing input
 decks.
 
-TSP was used by the author to generate input files for MCNP code
+TWPS was used by the author to generate input files for MCNP code
 :raw-latex:`\cite{mcnpREF}` and KANEXT system :raw-latex:`\cite{kanext}` under
 Linux and Windows operating systems.
 
@@ -36,7 +36,7 @@ improvements can include the following:
     * Specification of the default snippet key, commenting characters and delimiters
       in the preprocessor command line rather than in the template's first line.
 
-The TSP Python package has been written during work on several projects funded
+The TWPS Python package has been written during work on several projects funded
 by the European Commission: ELSY :raw-latex:`\cite{ELSY}`, LEADER
 :raw-latex:`\cite{LEADERWEB}` and CDT :raw-latex:`\cite{CDT09}`.
 
