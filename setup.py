@@ -2,6 +2,10 @@
 from setuptools import setup
 import twps
 
+with open('README.rst', 'r') as f:
+    long_description = f.read()
+    long_description_type = 'text/x-rst'
+
 setup(name='twps',
       packages=['twps', ],
 
@@ -16,6 +20,8 @@ setup(name='twps',
       license='GPL',
 
       description='TWPS: (T)ext (W)ith (P)ython (S)nippets preprocessor',
+      long_description=long_description,
+      long_description_content_type=long_description_type,
       author='A.Travleev',
       author_email='anton.travleev@gmail.com',
       url='https://github.com/inr-kit/twps',
@@ -28,11 +34,11 @@ setup(name='twps',
           'Intended Audience :: Science/Research',
           'Intended Audience :: Education',
           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-          'Programming Language :: Python :: 2.7', 
+          'Programming Language :: Python :: 2.7',
           'Topic :: Text Processing :: Markup',
           'Topic :: Text Processing :: Filters',
           'Topic :: Text Processing :: General',
           'Topic :: Utilities',
       ],
-      install_requires='re textwrap traceback stat datetime'.split(),
+      install_requires='textwrap traceback stat datetime'.split(),
       )
