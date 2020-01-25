@@ -9,14 +9,9 @@ with open('README.rst', 'r') as f:
 setup(name='twps',
       packages=['twps', ],
 
-      # version: X.Y.Z, where:
-      #    X -- major version. Major versions are not back-compatible.
-      #         New major version number, when code is rewritten
-      #
-      #    Y -- minor version. New minor version, when new function(s) added.
-      #
-      #    Z -- update, new update number when a bug is fixed.
-      version=twps.__version__,  # '1.3.2',
+      # Use setuptools_scn
+      use_scm_version=True,
+      setup_requires=['setuptools_scm'],
       license='GPL',
 
       description='TWPS: (T)ext (W)ith (P)ython (S)nippets preprocessor',
@@ -25,7 +20,6 @@ setup(name='twps',
       author='A.Travleev',
       author_email='anton.travleev@gmail.com',
       url='https://github.com/inr-kit/twps',
-      download_url='https://github.com/inr-kit/twps/archive/2.0.0.tar.gz',
       keywords='TEXT PYTHON SNIPPETS TEMPLATE PREPROCESSOR'.split(),
       scripts=['twps/ppp.py'],
       classifiers=[
@@ -40,5 +34,4 @@ setup(name='twps',
           'Topic :: Text Processing :: General',
           'Topic :: Utilities',
       ],
-      install_requires='textwrap traceback stat datetime'.split(),
       )
