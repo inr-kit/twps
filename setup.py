@@ -22,6 +22,9 @@ setup(name='twps',
       url='https://github.com/inr-kit/twps',
       keywords='TEXT PYTHON SNIPPETS TEMPLATE PREPROCESSOR'.split(),
       scripts=['twps/ppp.py'],
+      package_data={
+          '': ['*.rst'],  # for readme.rst
+      },
       classifiers=[
           'Development Status :: 4 - Beta',
           'Environment :: Console',
