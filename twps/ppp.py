@@ -33,7 +33,6 @@ import twps  # from twps import pre_pro, params
 
 def main():
     if len(argv) < 2 or '--help' in ''.join(argv[1:]).lower():
-        print twps.__file__
         readme = path.join(path.dirname(twps.__file__), 'readme.rst')
         with open(readme, 'r') as f:
             msg = f.read()
