@@ -1,6 +1,7 @@
 twps.egg-info/*
 
 twps/*.pyc
+twps/version.py
 
 docs/build/*
 

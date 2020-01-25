@@ -4,19 +4,14 @@ TWPS: (T)ext (W)ith (P)ython (S)nippets
 A python package to preprocess text files with embedded Python code snippets:
 evaluate or execute them and replace with the result of evaluation/execution.
 
-Currently, the only up-to-date description of the command line arguments can be
-found in the source code `twps/ppp.py`_ or by calling the ``ppp.py`` script
-with the ``--help`` command line argument (or without any arguments). The
-description_ found in the ``docs`` folder still describes correctly the main
-idea and the syntax of the template file, but not the command line arguments. 
+This package provides the ``ppp.py`` script. The script reads the file
+specified in the command line, finds python snippets, evaluates or executes
+them and writes out the file with the pyhton code replaced with the
+evaluateion/execution result. 
 
-.. _`twps/ppp.py`: twps/ppp.py
-.. _description: docs/build/latex/twps.pdf
+For command line options see ``readme.rst`` in the ``twps`` folder or run the
+script without command line arguemnt. 
 
-
-Folder `docs`_ contains sources for documentation, written in 2013. It cannot
-be compiled as is with the current version of Sphinx/rst2pdf. Result of
-compilation into HTML will be added later.
-
-.. _docs: ./docs
+General description with examples (somewhat outdated) can be found in the
+``docs`` folder. 
 

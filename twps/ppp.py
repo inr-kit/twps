@@ -28,36 +28,15 @@ Script provides command line interface to the TWPS python package.
 
 from sys import argv
 from os import path
-from twps import pre_pro, params
+import twps  # from twps import pre_pro, params
 
 
 def main():
-    msg = """
-(P)ython (P)re(P)rocessor: script from the twps Python package. Abbreviation
-"twps" means (T)ext with (S)nippets (P)reprocessor.
-
-Usage:
-
-> {} template.t [-'snippet'] [--'name1 vals1' --'name2 vals2' ...]
-
-where `template.t' is a text file containing python snippets.  Snippets are
-evaluated/executed and the snippet code is replaced with the result of
-evaluation/execution. The resulting file is saved to `template.res.t'.
-
-When optional `snippet` is given, it is evaluated or executed before the
-snippets in `template.t`. If the snippet contains spaces, protect them with
-quotes, i.e. -'a = 5'.
-
-One can provide variable names and set of their values. The template will be
-processed  with all possible combinations. For example, if one argument
-starting with two dashes is given, i.e. --'v 1 2 3', three resulting files will
-be created, named `template._0.t', `template._1.t' etc. The `v' variable will
-be set subsequently to each of the given values. If more than one `--' options
-are given, they constitute nested loops.
-
-""".format(path.basename(argv[0]))
-
     if len(argv) < 2 or '--help' in ''.join(argv[1:]).lower():
+        print twps.__file__
+        readme = path.join(path.dirname(twps.__file__), 'readme.rst')
+        with open(readme, 'r') as f:
+            msg = f.read()
         print msg
     else:
         # All arguments starting with '--' are variable names, which list of
@@ -71,7 +50,7 @@ are given, they constitute nested loops.
         templates = []
         for a in argv[1:]:
             if len(a) > 2 and a[:2] == '--':
-                nvi = params(a[2:])
+                nvi = twps.params(a[2:])
                 clp.append(nvi)
             elif len(a) > 1 and a[:1] == '-':
                 # this is a snippet
@@ -79,14 +58,14 @@ are given, they constitute nested loops.
             elif path.exists(a):
                 templates.append(a)
             else:
-                print 'Skipping argument', repr(a)
+                print 'Skipping argument (neither existing file nor recognized option)', repr(a)
 
         if clp:
             print 'Parameters:', clp
         if preamb:
             print 'Command-line snippet:', preamb
         for t in templates:
-            pre_pro(fname=t, level='main', preamb=preamb, clp=clp)
+            twps.pre_pro(fname=t, level='main', preamb=preamb, clp=clp)
 
 
 if __name__ == '__main__':
