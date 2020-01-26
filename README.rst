@@ -9,6 +9,14 @@ specified in the command line, finds python snippets, evaluates or executes
 them and writes out the file with the pyhton code replaced with the
 evaluateion/execution result. 
 
+Install
+----------
+The package is published on PyPI: https://pypi.org/project/twps/. The preffered way to install is:
+
+  >pip install twps
+
+Getting help
+--------------
 For command line options see ``readme.rst`` in the ``twps`` folder or run the
 script without command line arguemnt. 
 
