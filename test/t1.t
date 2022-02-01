@@ -11,3 +11,9 @@ and this is an execution snippet:
 
 Check that the definitions made in the
 previous snippets are accessible: `pi2`.
+
+Get the current version of twps: `import twps`, 
+`twps.version`
+
+Get the current date: `import datetime`, 
+`datetime.datetime.now()`
