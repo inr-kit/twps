@@ -52,6 +52,8 @@ See detailed description in 'doc' directory of the source distribution.
 # Author: Anton Travleev, anton.travleev@gmail.com
 # Developed at INR, Karlsruhe Institute of Technology
 
+from __future__ import print_function
+
 import re
 from textwrap import dedent
 import sys
@@ -59,7 +61,8 @@ import os
 import traceback
 from os import path, chmod, getcwd, utime
 from stat import S_IREAD, S_IWRITE
-from twps.utils import variants
+
+from .utils import variants
 
 # Log level:
 #       0 -- errors
@@ -102,7 +105,7 @@ class _Log(object):
             sign += '\n    snippet {}'.format(snippet)
 
         if mlev <= self.level:
-            print >> sys.__stdout__, sign, msg
+            print(sign, msg, file=sys.stdout)
 
 
 class _WritableObject:
@@ -290,7 +293,7 @@ def pre_pro(fname, level='default', preamb='', clp=[], **kwargs):
     the first line the commenting string and snippet default key.
 
     """
-    tfile = open(fname, 'rb')
+    tfile = open(fname, 'r')  # why rb?
     _log = _Log(fname, _logLevel)
     # check template and resulting files modification time with seconds
     # precision. More precision is not needed.
@@ -343,7 +346,7 @@ def pre_pro(fname, level='default', preamb='', clp=[], **kwargs):
     gld['pre_pro'] = pre_pro
 
     # Add parameter values from kwargs to clp
-    clp = clp + kwargs.items()
+    clp = clp + list(kwargs.items())
     res = []  # resulting strings.
     _log(3, 'Complete set of parameters: {}'.format(clp))
     for pidx, Plst in variants(clp):

@@ -26,6 +26,8 @@ Script provides command line interface to the TWPS python package.
 # Developed at INR, Karlsruhe Institute of Technology
 # at
 
+from __future__ import print_function
+
 from sys import argv
 from os import path
 import twps  # from twps import pre_pro, params
@@ -36,7 +38,7 @@ def main():
         readme = path.join(path.dirname(twps.__file__), 'readme.rst')
         with open(readme, 'r') as f:
             msg = f.read()
-        print msg
+        print(msg)
     else:
         # All arguments starting with '--' are variable names, which list of
         # values is given as the next argument. The remaining argument is
@@ -57,12 +59,12 @@ def main():
             elif path.exists(a):
                 templates.append(a)
             else:
-                print 'Skipping argument (neither existing file nor recognized option)', repr(a)
+                print('Skipping argument (neither existing file nor recognized option)', repr(a))
 
         if clp:
-            print 'Parameters:', clp
+            print('Parameters:', clp)
         if preamb:
-            print 'Command-line snippet:', preamb
+            print('Command-line snippet:', preamb)
         for t in templates:
             twps.pre_pro(fname=t, level='main', preamb=preamb, clp=clp)
 

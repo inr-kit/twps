@@ -31,8 +31,8 @@ pre_pro() function can be used.
 
 """
 
-from text_with_snippets import pre_pro
-from utils import params
+from .text_with_snippets import pre_pro
+from .utils import params
 
 try:
     from .version import version
