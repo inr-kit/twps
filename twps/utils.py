@@ -46,10 +46,10 @@ def params(cla):
     else:
         i0 = 0
     try:
-        vals = map(int, tokens)
+        vals = list(map(int, tokens))
     except ValueError:
         try:
-            vals = map(float, tokens)
+            vals = list(map(float, tokens))
         except ValueError:
-            vals = map(None, tokens)
+            vals = list(tokens)  # map(None, tokens)
     return (vname, vals, i0)
